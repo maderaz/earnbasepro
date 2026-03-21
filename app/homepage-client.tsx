@@ -1,15 +1,16 @@
 'use client';
 
 /**
- * Client-side interactive shell for the homepage.
- * The server component renders the full SEO HTML above this.
- * This component will eventually mount the full interactive UI
- * (sorting, filtering, charts, dark mode toggle, etc.)
- *
- * Phase 1: Placeholder — just receives data props for future use.
- * Phase 3: Will port the full Dashboard, TrackerTable, AssetGrid, etc.
+ * HomepageClient — Full interactive homepage UI.
+ * On mount, hides the SSR skeleton (#homepage-seo-content) and renders the
+ * polished interactive components in its place.
  */
 
+import { useEffect } from 'react';
+import { RegistryProvider } from './hooks/useRegistry';
+import { HeroSection } from './components/HeroSection';
+import { TrackerTable } from './components/TrackerTable';
+import { TopDeFiYields, HomepageContent } from './components/HomepageContent';
 import type { DeFiProduct, DisplaySettings } from '@/lib/api';
 
 interface Props {
@@ -19,8 +20,21 @@ interface Props {
   displaySettings: DisplaySettings;
 }
 
-export function HomepageClient({ initialProducts, tickers, tickerCounts, displaySettings }: Props) {
-  // Phase 1: No interactive UI yet — all content is in the Server Component above.
-  // Phase 3 will mount the full interactive dashboard here.
-  return null;
+export function HomepageClient({ initialProducts, tickers }: Props) {
+  // Hide SSR skeleton once client JS is ready
+  useEffect(() => {
+    const el = document.getElementById('homepage-seo-content');
+    if (el) el.style.display = 'none';
+  }, []);
+
+  return (
+    <RegistryProvider>
+      <div className="space-y-10 lg:space-y-14">
+        <HeroSection products={initialProducts} />
+        <TopDeFiYields products={initialProducts} />
+        <TrackerTable products={initialProducts} allTickers={tickers} />
+        <HomepageContent products={initialProducts} />
+      </div>
+    </RegistryProvider>
+  );
 }

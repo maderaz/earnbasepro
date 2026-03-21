@@ -96,8 +96,8 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }}
       />
 
-      {/* SSR content visible to crawlers */}
-      <div className="space-y-12">
+      {/* SSR content visible to crawlers — hidden by HomepageClient once JS loads */}
+      <div id="homepage-seo-content" className="space-y-12">
         {/* Hero */}
         <section>
           <h1 className="text-2xl font-semibold text-foreground">

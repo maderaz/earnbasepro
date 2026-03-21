@@ -74,3 +74,27 @@ export async function fetchDisplaySettings(): Promise<DisplaySettings> {
     return { assetMinTvl: 0, homeMinTvl: 0, showZeroApy: false };
   }
 }
+
+export interface RegistryItem {
+  _type?: string;
+  _id?: string;
+  name?: string;
+  ticker?: string;
+  aliases?: string[];
+  iconUrl?: string;
+}
+
+export interface RegistryAll {
+  networks: RegistryItem[];
+  assets: RegistryItem[];
+  platforms: RegistryItem[];
+  curators: RegistryItem[];
+}
+
+export async function fetchRegistry(): Promise<RegistryAll> {
+  try {
+    return await request<RegistryAll>('/registry');
+  } catch {
+    return { networks: [], assets: [], platforms: [], curators: [] };
+  }
+}
