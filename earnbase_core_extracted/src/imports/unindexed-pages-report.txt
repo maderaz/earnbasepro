@@ -1,0 +1,180 @@
+info
+Duplicate without user-selected canonical
+These pages aren't indexed or served on Google
+First detected: 27/01/2026
+Finished fixing?
+Affected pages
+78
+06/12/2025
+17/12/2025
+28/12/2025
+08/01/2026
+19/01/2026
+30/01/2026
+10/02/2026
+21/02/2026
+90
+60
+30
+0
+Examples
+
+URL	Last crawled
+https://earnbase.finance/vault/usdc-resolv-usdc-euler-apostro
+3 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-prime-morpho-gauntlet
+3 Mar 2026
+https://earnbase.finance/vault/wbtc-wbtc-pool-across-protocol
+3 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-fusion-ipor
+3 Mar 2026
+https://earnbase.finance/vault/usdc-f-protocol-morpho-re7-mainnet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-gauntlet-usdc-frontier-morpho
+2 Mar 2026
+https://earnbase.finance/vault/usdc-moonwell-flagship-b-protocol-morpho
+2 Mar 2026
+https://earnbase.finance/vault/eth-staking-product-meth-protocol
+2 Mar 2026
+https://earnbase.finance/vault/cbbtc-cbbtc-core-morpho-gauntlet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-morpho-steakhouse
+2 Mar 2026
+https://earnbase.finance/vault/usdc-moonwell-autocompounder-harvest
+2 Mar 2026
+https://earnbase.finance/vault/usdc-mopho-moonwell-flagship-usdc-compounder-yearn
+2 Mar 2026
+https://earnbase.finance/vault/usdc-tulipa-euler-tulipa
+2 Mar 2026
+https://earnbase.finance/vault/usdc-fusion-lending-optimizer-ipor-fusion
+2 Mar 2026
+https://earnbase.finance/vault/usdc-wintermute-trading-private-credit-wildcat
+2 Mar 2026
+https://earnbase.finance/vault/eth-extrafi-autocompounder-harvest
+2 Mar 2026
+https://earnbase.finance/vault/usdc-blue-chip-usdc-vault-morpho-sparkdao
+2 Mar 2026
+https://earnbase.finance/vault/wbtc-core-morpho-gauntlet-mainnet
+2 Mar 2026
+https://earnbase.finance/vault/cbbtc-usdc-market-aave
+2 Mar 2026
+https://earnbase.finance/vault/usdt-v3-aave
+2 Mar 2026
+https://earnbase.finance/vault/usdc-compound-autocompounder-beefy
+2 Mar 2026
+https://earnbase.finance/vault/usdc-elixir-usdc-morpho-mev-capital
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-vault-morpho-re7
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-lending-optimizer-ipor-fusion-tesseract
+2 Mar 2026
+https://earnbase.finance/vault/usdc-resolv-usdc-morpho-gauntlet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-labs-cluster-euler-re7
+2 Mar 2026
+https://earnbase.finance/vault/usdc-ultrayield-usdc-morpho-edge-capital
+2 Mar 2026
+https://earnbase.finance/vault/usdc-pyth-usdc-morpho-re7
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-vaults-morpho-pangolins
+2 Mar 2026
+https://earnbase.finance/vault/usdc-moonwell-flagship-morpho-b-protocol
+2 Mar 2026
+https://earnbase.finance/vault/usdc-prime-usdc-morpho-gauntlet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-high-yield-usdc-clearstar-morpho
+2 Mar 2026
+https://earnbase.finance/vault/usdc-og-usdc-morpho-yearn
+2 Mar 2026
+https://earnbase.finance/vault/usdc-euler-yield-euler-eulerdao
+2 Mar 2026
+https://earnbase.finance/vault/usdc-high-yield-usdc-v1-1-morpho-steakhouse
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-vault-morpho-august-digital
+2 Mar 2026
+https://earnbase.finance/vault/wbtc-lending-fluid-mainnet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-high-yield-usdc-v1-1-steakhouse-morpho
+2 Mar 2026
+https://earnbase.finance/vault/usdc-seamless-usdc-morpho-gauntlet
+2 Mar 2026
+https://earnbase.finance/vault/eth-infinifi-eth-carry-ipor-fusion
+2 Mar 2026
+https://earnbase.finance/vault/wbtc-reservoir-btc-yield-leveraged-looping-ipor-fusion
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-rwa-morpho-gauntlet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-frontier-usdc-vault-morpho-mev-capital
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-vault-lagoon-excellion
+2 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-reactor-morpho-clearstar
+2 Mar 2026
+https://earnbase.finance/vault/cbbtc-cbbtc-market-extrafi
+2 Mar 2026
+https://earnbase.finance/vault/usdc-cap-ecosystem-usdc-morpho-gauntlet
+2 Mar 2026
+https://earnbase.finance/vault/usdc-fx-protocol-morpho-re7
+1 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-yield-morpho-kpk
+1 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-degen-morpho-hyperithm
+1 Mar 2026
+https://earnbase.finance/vault/usdc-euler-prime-euler-eulerdao
+1 Mar 2026
+https://earnbase.finance/vault/usdc-infinifi-usdc-morpho-steakhouse
+1 Mar 2026
+https://earnbase.finance/vault/usdc-derivatives-pool-ipor-fusion
+1 Mar 2026
+https://earnbase.finance/vault/usdc-cronos-usdc-ecosystem-morpho-steakhouse
+1 Mar 2026
+https://earnbase.finance/vault/usdc-stablecoin-maxi-euler-re7
+1 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-vault-morpho-sparkdao
+1 Mar 2026
+https://earnbase.finance/vault/usdc-autonomous-liquidity-usd-lagoon-almanak
+1 Mar 2026
+https://earnbase.finance/vault/usdc-resolv-euler-apostro
+1 Mar 2026
+https://earnbase.finance/vault/usdc-resolv-usdc-morpho-apostro
+1 Mar 2026
+https://earnbase.finance/vault/usdc-extrafi-xlend-usdc-morpho-gauntlet
+1 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-frontier-morpho-gauntlet
+1 Mar 2026
+https://earnbase.finance/vault/eth-wsteth-looping-ipor-fusion
+1 Mar 2026
+https://earnbase.finance/vault/usdc-usdc-vault-morpho-apostro
+1 Mar 2026
+https://earnbase.finance/vault/usdc-vault-bridge-usdc-morpho-steakhouse
+28 Feb 2026
+https://earnbase.finance/vault/usdc-usdc-prime-morpho-kpk
+28 Feb 2026
+https://earnbase.finance/vault/usdc-euler-arbitrum-yield-euler-gauntlet
+28 Feb 2026
+https://earnbase.finance/vault/usdc-usdc-ipor-fusion
+28 Feb 2026
+https://earnbase.finance/vault/usdc-usdc-vault-lagoon-syntropia
+28 Feb 2026
+https://earnbase.finance/vault/usdc-high-yield-usdc-morpho-clearstar
+28 Feb 2026
+https://earnbase.finance/vault/usdc-turtle-avalanche-usdc-lagoon-9summits
+26 Feb 2026
+https://earnbase.finance/vault/usdc-turtle-usdc-morpho-9summits
+26 Feb 2026
+https://earnbase.finance/vault/usdt-wintermute-trading-private-credit-wildcat
+25 Feb 2026
+https://earnbase.finance/vault/eth-weeth-euler-base-euler-gauntlet
+25 Feb 2026
+https://earnbase.finance/vault/usdc-usdc-cluster-euler-re7
+25 Feb 2026
+https://earnbase.finance/vault/cbbtc-flagship-cbbtc-lagoon-tulipa-capital
+24 Feb 2026
+https://earnbase.finance/vault/usdc-turtle-avalanche-usdc-9summits-lagoon
+13 Feb 2026
+https://earnbase.finance/vault/usdt-deltausd-lagoon-smardex
+9 Feb 2026
+https://earnbase.finance/usdc/base/morpho-seamless-usdc-(gauntlet)
+26 Jan 2026
+Rows per page:
+1-78 of 78
