@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { vaultProductSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
 import type { DeFiProduct } from '@/lib/api';
+import { VaultClient } from './vault-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VaultPage({ params }: Props) {
   const { slug } = await params;
-  const { products } = await fetchPools();
+  const { products, privateCreditIds } = await fetchPools();
   const product = findProduct(products, slug);
 
   if (!product) {
@@ -71,11 +72,15 @@ export default async function VaultPage({ params }: Props) {
     .sort((a, b) => b.spotAPY - a.spotAPY)
     .slice(0, 10);
 
+  const isPrivateCredit = (privateCreditIds || []).some(id => String(id) === String(product.id)) ||
+    product.platform_name.toLowerCase() === 'wildcat';
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <div className="space-y-10">
+      {/* SSR skeleton — hidden by VaultClient once JS loads */}
+      <div id="vault-seo-content" className="space-y-10">
         {/* Breadcrumb */}
         <nav className="text-sm text-muted-foreground">
           <a href="/" className="hover:text-foreground">Home</a>
@@ -167,6 +172,13 @@ export default async function VaultPage({ params }: Props) {
           </section>
         )}
       </div>
+
+      {/* Interactive client component */}
+      <VaultClient
+        product={JSON.parse(JSON.stringify(product))}
+        products={JSON.parse(JSON.stringify(products))}
+        isPrivateCredit={isPrivateCredit}
+      />
     </>
   );
 }
