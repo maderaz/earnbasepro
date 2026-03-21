@@ -97,7 +97,7 @@ export default async function HomePage() {
       />
 
       {/* SSR content visible to crawlers */}
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+      <div className="space-y-12">
         {/* Hero */}
         <section>
           <h1 className="text-2xl font-semibold text-foreground">
@@ -216,7 +216,7 @@ export default async function HomePage() {
             </p>
           )}
         </section>
-      </main>
+      </div>
 
       {/* Client component for interactive features (sorting, filtering, charts) */}
       <HomepageClient

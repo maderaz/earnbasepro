@@ -45,11 +45,11 @@ export default async function VaultPage({ params }: Props) {
 
   if (!product) {
     return (
-      <main className="max-w-6xl mx-auto px-4 py-32 text-center">
+      <div className="py-24 text-center">
         <h1 className="text-xl font-medium">Vault Not Found</h1>
         <p className="text-muted-foreground mt-2">This vault doesn't exist or has been removed.</p>
         <a href="/" className="inline-block mt-4 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-sm font-semibold">Back to Home</a>
-      </main>
+      </div>
     );
   }
 
@@ -75,7 +75,7 @@ export default async function VaultPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+      <div className="space-y-10">
         {/* Breadcrumb */}
         <nav className="text-sm text-muted-foreground">
           <a href="/" className="hover:text-foreground">Home</a>
@@ -166,7 +166,7 @@ export default async function VaultPage({ params }: Props) {
             </div>
           </section>
         )}
-      </main>
+      </div>
     </>
   );
 }

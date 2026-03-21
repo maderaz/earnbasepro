@@ -54,7 +54,7 @@ export default async function AssetHubPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+      <div className="space-y-10">
         <section>
           <h1 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yield Strategies
@@ -122,17 +122,17 @@ export default async function AssetHubPage({ params }: Props) {
             ))}
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }
 
 function NotFound() {
   return (
-    <main className="max-w-6xl mx-auto px-4 py-32 text-center">
+    <div className="py-24 text-center">
       <h1 className="text-xl font-medium">Page Not Found</h1>
       <p className="text-muted-foreground mt-2">This page doesn't exist on Earnbase.</p>
       <a href="/" className="inline-block mt-4 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-sm font-semibold">Back to Home</a>
-    </main>
+    </div>
   );
 }

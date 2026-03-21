@@ -30,7 +30,7 @@ export default async function AboutPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <main className="max-w-3xl mx-auto px-4 py-8 space-y-12">
+      <div className="max-w-3xl space-y-12">
         <nav className="text-sm text-muted-foreground">
           <a href="/" className="hover:text-foreground">Home</a>
           <span className="mx-1">/</span>
@@ -109,7 +109,7 @@ export default async function AboutPage() {
             ← Back to Home
           </a>
         </section>
-      </main>
+      </div>
     </>
   );
 }

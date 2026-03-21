@@ -61,7 +61,7 @@ export default async function NetworkPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+      <div className="space-y-10">
         <nav className="text-sm text-muted-foreground">
           <a href="/" className="hover:text-foreground">Home</a>
           <span className="mx-1">/</span>
@@ -115,7 +115,7 @@ export default async function NetworkPage({ params }: Props) {
             ← All {T} strategies
           </a>
         </section>
-      </main>
+      </div>
     </>
   );
 }

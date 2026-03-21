@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Layout } from './components/Layout';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -38,7 +39,7 @@ export default function RootLayout({
         <link rel="llms-txt" href="https://files.earnbase.finance/llms.txt" />
       </head>
       <body className="bg-background text-foreground antialiased">
-        {children}
+        <Layout>{children}</Layout>
       </body>
     </html>
   );
