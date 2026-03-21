@@ -30,6 +30,7 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedNetwork, setSelectedNetwork] = useState<string>('all');
   const [minTVL, setMinTVL] = useState<number>(0);
+  const [displayCount, setDisplayCount] = useState(100);
   const [sortConfig, setSortConfig] = useState<{ key: keyof DeFiProduct; direction: 'asc' | 'desc' } | null>(
     { key: 'spotAPY', direction: 'desc' }
   );
@@ -116,7 +117,7 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
     return direction === 'asc' ? strA.localeCompare(strB) : strB.localeCompare(strA);
   }), [products, sortConfig]);
 
-  const filteredProducts = sortedProducts.filter(p => {
+  const filteredProducts = useMemo(() => sortedProducts.filter(p => {
     const q = searchTerm.toLowerCase();
     const matchesSearch = !q ||
       (p.platform_name?.toLowerCase() || '').includes(q) ||
@@ -127,7 +128,13 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
     const matchesNet = checkNetworkMatch(p.network, selectedNetwork);
     const matchesTvl = p.tvl >= minTVL;
     return matchesSearch && matchesNet && matchesTvl;
-  });
+  }), [sortedProducts, searchTerm, selectedNetwork, minTVL, checkNetworkMatch]);
+
+  // Reset pagination when filters change
+  useEffect(() => { setDisplayCount(100); }, [searchTerm, selectedNetwork, minTVL]);
+
+  const visibleProducts = filteredProducts.slice(0, displayCount);
+  const hasMore = filteredProducts.length > displayCount;
 
   const showClearFilters = searchTerm !== '' || selectedNetwork !== 'all' || minTVL !== 0 ||
     pathname.split('/').filter(Boolean).length > 1;
@@ -270,7 +277,7 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
                       <td className="pr-3 lg:pr-4 py-4"><div className="h-4 w-4 bg-muted rounded ml-auto" /></td>
                     </tr>
                   ))
-                ) : filteredProducts.map((product, index) => {
+                ) : visibleProducts.map((product, index) => {
                   const vaultUrl = `/vault/${getProductSlug(product)}`;
                   const assetIcon = resolveAssetIcon(product.ticker);
                   const networkIcon = resolveNetworkIcon(product.network);
@@ -350,6 +357,26 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
           </div>
         </div>
       </div>
+
+      {/* Show more / pagination */}
+      {hasMore && (
+        <div className="flex items-center justify-center gap-4 py-5 border-t border-border/50">
+          <span className="text-[12px] text-muted-foreground">
+            Showing {displayCount} of {filteredProducts.length} strategies
+          </span>
+          <button
+            onClick={() => setDisplayCount(c => c + 100)}
+            className="px-5 py-2 text-[12px] font-semibold text-[#08a671] border border-[#08a671]/30 rounded-lg hover:bg-[#08a671]/5 transition-colors"
+          >
+            Show 100 more
+          </button>
+        </div>
+      )}
+      {!hasMore && filteredProducts.length > 100 && (
+        <div className="text-center py-4 text-[12px] text-muted-foreground">
+          All {filteredProducts.length} strategies shown
+        </div>
+      )}
 
       {/* Mobile sticky controls */}
       <div className="lg:hidden fixed bottom-6 left-0 right-0 z-50 px-4 pointer-events-none">
