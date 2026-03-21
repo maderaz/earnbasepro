@@ -1,0 +1,128 @@
+# Client-Side Redirects for Old URLs
+
+## Instruction for Figma AI
+
+Google has indexed old URLs that no longer work. We need to redirect them to their correct new URLs. Since we cannot do server-side 301 redirects (Cloudflare Worker doesn't intercept requests on earnbase.finance), implement client-side redirects in the app's router.
+
+## How It Works
+
+On page load (or in the router), check if the current URL path matches any entry in the redirect map below. If it does, immediately redirect to the new URL using `window.location.replace()`. This must happen BEFORE the page renders any content — no flash of "No products available".
+
+## Implementation
+
+Add this logic as early as possible in the app initialization — ideally in the router or the root component before anything renders:
+
+```javascript
+const REDIRECTS = {
+  // Garbage URLs
+  "/$": "/",
+  "/&": "/",
+  "/sitemap": "/",
+
+  // Uppercase ticker hub pages
+  "/ETH": "/eth",
+  "/EURC": "/eurc",
+  "/USDC": "/usdc",
+  "/USDT": "/usdt",
+  "/WBTC": "/wbtc",
+  "/cbBTC": "/cbbtc",
+
+  // Uppercase ticker/network pages
+  "/ETH/Base": "/eth/base",
+  "/ETH/Mainnet": "/eth/mainnet",
+  "/EURC/Mainnet": "/eurc/mainnet",
+  "/USDC/Arbitrum": "/usdc/arbitrum",
+  "/USDC/Base": "/usdc/base",
+  "/USDC/Mainnet": "/usdc/mainnet",
+  "/USDT/Mainnet": "/usdt/mainnet",
+  "/WBTC/Arbitrum": "/wbtc/arbitrum",
+  "/cbBTC/Base": "/cbbtc/base",
+
+  // Invalid network slugs
+  "/cbbtc/eth": "/cbbtc",
+  "/eurc/eth": "/eurc",
+  "/eurc/ethereum": "/eurc",
+  "/usdt/eth": "/usdt",
+  "/usdt/ethereum": "/usdt",
+  "/wbtc/eth": "/wbtc",
+  "/EURC/Avalanche": "/eurc",
+
+  // Old network slug
+  "/usdc/bnb-chain": "/usdc/bnb",
+
+  // Old format: /{ticker}/{network}/{product} → /vault/{new-slug}
+  "/usdc/arbitrum/harvest-dolomite-autocompounder": "/vault/usdc-dolomite-autocompounder-harvest-arbitrum",
+  "/usdc/arbitrum/morpho-ultrayield-usdc-(edge-capital)": "/vault/usdc-ultrayield-morpho-edge-capital-arbitrum",
+  "/usdc/avalanche/euler-usdc---k3-capital-cluster": "/vault/usdc-cluster-euler-k3-capital-avalanche",
+  "/usdc/avalanche/folks-finance-lending-market": "/vault/usdc-lending-market-folks-finance-avalanche",
+  "/usdc/base/beefy-compound-v3-autocompounder": "/vault/usdc-compound-v3-autocompounder-beefy-base",
+  "/usdc/base/harvest-arcadia-autocompounder": "/vault/usdc-arcadia-autocompounder-harvest-base",
+  "/usdc/base/harvest-autopilot": "/vault/usdc-autopilot-harvest-base",
+  "/usdc/base/morpho-high-yield-usdc-(clearstar)": "/vault/usdc-high-yield-morpho-clearstar-base",
+  "/usdc/base/morpho-universal-usdc-(re7-labs)": "/vault/usdc-universal-morpho-re7-base",
+  "/usdc/ethereum/maple-test-test-earn-maple": "/vault/usdc-earn-maple-mainnet",
+  "/usdc/mainnet/euler-euler-prime-(eulerdao)": "/vault/usdc-euler-prime-eulerdao-mainnet",
+  "/usdc/mainnet/euler-openeden-usdc-(ouroboros-capital)": "/vault/usdc-openeden-euler-ouroboros-capital-mainnet",
+  "/usdc/mainnet/lagoon-autonomous-liquidity-usd-(almanak)": "/vault/usdc-autonomous-liquidity-usd-lagoon-almanak-mainnet",
+  "/usdc/mainnet/morpho-blue-chip-usdc-vault-(sparkdao)": "/vault/usdc-blue-chip-vault-morpho-sparkdao-mainnet",
+  "/usdc/mainnet/morpho-swissborg-usdc-(gauntlet)": "/vault/usdc-swissborg-morpho-gauntlet-mainnet",
+  "/usdc/mainnet/morpho-tac-usdc-(9summits)": "/vault/usdc-core-morpho-9summits-mainnet",
+  "/usdc/mainnet/morpho-vault-bridge-usdc-(steakhouse)": "/vault/usdc-vault-bridge-morpho-steakhouse-mainnet",
+  "/usdc/mainnet/yearn-morpho-steakhouse-usdc-compounder": "/vault/usdc-morpho-steakhouse-compounder-yearn-mainnet",
+
+  // Old vault slugs (missing network suffix)
+  "/vault/cbbtc-cbbtc-market-radiant-v2": "/vault/cbbtc-market-radiant-v2-base",
+  "/vault/eth-morpho-yearn-og-weth-compounder-yearn": "/vault/eth-morpho-yearn-og-weth-compounder-mainnet",
+  "/vault/eth-weth-lend-fluid": "/vault/eth-weth-lend-fluid-mainnet",
+  "/vault/eth-weth-lend-pool-arcadia": "/vault/eth-weth-lend-pool-arcadia-base",
+  "/vault/eth-weth-spark": "/vault/eth-weth-spark-mainnet",
+  "/vault/eth-wsteth-aave": "/vault/eth-wsteth-aave-mainnet",
+  "/vault/eth-wsteth-spark": "/vault/eth-wsteth-spark-mainnet",
+  "/vault/eurc-core-vault-yo": "/vault/eurc-core-vault-yo-base",
+  "/vault/usdc-apostro-euler-apostro": "/vault/usdc-apostro-euler-bnb",
+  "/vault/usdc-degen-usdc-morpho-yearn": "/vault/usdc-degen-morpho-yearn-arbitrum",
+  "/vault/usdc-earn-avusdc-avantis": "/vault/usdc-earn-avusdc-avantis-base",
+  "/vault/usdc-high-yield-usdc-morpho-steakhouse": "/vault/usdc-high-yield-morpho-steakhouse-base",
+  "/vault/usdc-private-credit-wildcat-hyperithm": "/vault/usdc-private-credit-wildcat-hyperithm-mainnet",
+  "/vault/usdc-srusd-leveraged-looping-ipor-fusion-reservoir": "/vault/usdc-srusd-ipor-fusion-reservoir-mainnet",
+  "/vault/usdc-swissborg-usdc-morpho-gauntlet": "/vault/usdc-swissborg-morpho-gauntlet-mainnet",
+  "/vault/usdc-universal-usdc-morpho-re7": "/vault/usdc-universal-morpho-re7-base",
+  "/vault/usdc-usdc-autopilot-harvest": "/vault/usdc-autopilot-harvest-mainnet",
+  "/vault/usdc-usdc-cluster-euler-k3-capital": "/vault/usdc-cluster-euler-k3-capital-avalanche",
+  "/vault/usdc-usdc-morpho-mev-capital": "/vault/usdc-morpho-mev-capital-mainnet",
+  "/vault/usdc-usdc-rwa-morpho-steakhouse": "/vault/usdc-rwa-morpho-steakhouse-mainnet",
+  "/vault/usdc-usdc-vault-august-digital-morpho": "/vault/usdc-vault-morpho-august-digital-mainnet",
+  "/vault/usdc-usdc-vault-morpho-hyperithm": "/vault/usdc-vault-morpho-hyperithm-arbitrum",
+  "/vault/usdc-usdc-vault-morpho-pangolins": "/vault/usdc-vaults-morpho-pangolins-base",
+  "/vault/usdt-flagship-usdt-morpho-b-protocol": "/vault/usdt-flagship-morpho-b-protocol-mainnet",
+  "/vault/usdt-wintermute-trading-private-credit-wildcat": "/vault/usdt-wintermute-trading-private-credit-wildcat-mainnet",
+  "/vault/wbtc-wbtc-market-spark": "/vault/wbtc-market-spark-mainnet",
+
+  // Dead products → hub page
+  "/vault/cbbtc-wintermute-trading-wildcat-mainnet": "/cbbtc",
+  "/vault/usdt-clearstar-boring-morpho-ethereum": "/usdt",
+};
+
+// Run this BEFORE rendering any page content:
+const path = window.location.pathname;
+const redirectTarget = REDIRECTS[path];
+if (redirectTarget) {
+  window.location.replace(redirectTarget);
+  // Stop execution — don't render the page
+}
+```
+
+## Important Notes
+
+1. This redirect check MUST run before the router renders any page. If the user sees "No products available" for even a split second before redirecting, it means the check runs too late.
+
+2. Use `window.location.replace()` not `window.location.href`. Replace does not create a back-button entry — the user won't get stuck in a redirect loop when pressing back.
+
+3. This is a static map — it only covers URLs that Google has already indexed. It does not need to grow unless we discover more old URLs in Google's index.
+
+4. After implementing, test these URLs:
+   - earnbase.finance/vault/eth-wsteth-aave → should redirect to /vault/eth-wsteth-aave-mainnet
+   - earnbase.finance/USDC → should redirect to /usdc
+   - earnbase.finance/usdc/mainnet/morpho-tac-usdc-(9summits) → should redirect to /vault/usdc-core-morpho-9summits-mainnet
+   - earnbase.finance/& → should redirect to /
+   - earnbase.finance/vault/usdc-v3-aave-mainnet → should NOT redirect (this is already correct)
