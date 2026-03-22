@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { assetHubSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
+import { computeAssetHubVars, buildAssetHubFaq } from '@/lib/assetSEOData';
 import { AssetHubClient } from './asset-hub-client';
 import { AssetSEOContent } from '../components/AssetSEOContent';
 
@@ -23,7 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const filtered = products.filter(p => (p.ticker || '').toUpperCase() === T);
   const networks = new Set(filtered.map(p => p.network));
   const sorted = [...filtered].sort((a, b) => b.spotAPY - a.spotAPY);
-  const seo = assetHubSEO(t, filtered.length, networks.size, sorted);
+
+  // Build FAQ items for FAQPage schema
+  const vars = computeAssetHubVars(t, products);
+  const faqItems = buildAssetHubFaq(vars);
+
+  const seo = assetHubSEO(t, filtered.length, networks.size, sorted, faqItems);
   const pageUrl = `${BASE_URL}/${t}`;
 
   return {
@@ -52,7 +58,11 @@ export default async function AssetHubPage({ params }: Props) {
   const networkCounts = new Map<string, number>();
   filtered.forEach(p => networkCounts.set(p.network, (networkCounts.get(p.network) || 0) + 1));
 
-  const seo = assetHubSEO(t, filtered.length, networks.size, sorted);
+  // Build FAQ for SSR HTML + JSON-LD schema
+  const vars = computeAssetHubVars(t, products);
+  const faqItems = buildAssetHubFaq(vars);
+
+  const seo = assetHubSEO(t, filtered.length, networks.size, sorted, faqItems);
 
   // Compute allTickers sorted by product count (for mobile asset switcher)
   const tickerCounts = new Map<string, number>();
@@ -132,6 +142,23 @@ export default async function AssetHubPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        {/* SSR FAQ — visible to crawlers; interactive accordion rendered by AssetSEOContent below */}
+        {faqItems.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Frequently Asked Questions — {T} Yields
+            </h2>
+            <div className="space-y-4">
+              {faqItems.map((item, i) => (
+                <div key={i}>
+                  <h3 className="text-sm font-medium text-foreground">{item.question}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{item.answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {/* Interactive client */}
@@ -141,7 +168,7 @@ export default async function AssetHubPage({ params }: Props) {
         allTickers={allTickers}
       />
 
-      {/* SEO editorial content */}
+      {/* SEO editorial content (client-side interactive accordion + about sections) */}
       <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(products))} />
     </>
   );
@@ -151,7 +178,7 @@ function NotFound() {
   return (
     <div className="py-24 text-center">
       <h1 className="text-xl font-medium">Page Not Found</h1>
-      <p className="text-muted-foreground mt-2">This page doesn't exist on Earnbase.</p>
+      <p className="text-muted-foreground mt-2">This page doesn&apos;t exist on Earnbase.</p>
       <a href="/" className="inline-block mt-4 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-sm font-semibold">Back to Home</a>
     </div>
   );
