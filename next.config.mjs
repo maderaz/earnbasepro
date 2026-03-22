@@ -15,25 +15,9 @@ const nextConfig = {
       { source: '/%24', destination: '/', permanent: true },
       { source: '/%26', destination: '/', permanent: true },
 
-      // ── Uppercase ticker hub pages ──
-      { source: '/ETH', destination: '/eth', permanent: true },
-      { source: '/EURC', destination: '/eurc', permanent: true },
-      { source: '/USDC', destination: '/usdc', permanent: true },
-      { source: '/USDT', destination: '/usdt', permanent: true },
-      { source: '/WBTC', destination: '/wbtc', permanent: true },
-      { source: '/cbBTC', destination: '/cbbtc', permanent: true },
-
-      // ── Uppercase ticker/network pages ──
-      { source: '/ETH/Base', destination: '/eth/base', permanent: true },
-      { source: '/ETH/Mainnet', destination: '/eth/mainnet', permanent: true },
-      { source: '/EURC/Mainnet', destination: '/eurc/mainnet', permanent: true },
-      { source: '/USDC/Arbitrum', destination: '/usdc/arbitrum', permanent: true },
-      { source: '/USDC/Base', destination: '/usdc/base', permanent: true },
-      { source: '/USDC/Mainnet', destination: '/usdc/mainnet', permanent: true },
-      { source: '/USDT/Mainnet', destination: '/usdt/mainnet', permanent: true },
-      { source: '/WBTC/Arbitrum', destination: '/wbtc/arbitrum', permanent: true },
-      { source: '/cbBTC/Base', destination: '/cbbtc/base', permanent: true },
-      { source: '/cbBTC/Mainnet', destination: '/cbbtc/mainnet', permanent: true },
+      // NOTE: uppercase ticker redirects removed — Next.js routes are case-insensitive
+      // (caseSensitive:false in routes-manifest) so /USDC→/usdc was creating a redirect
+      // loop: /usdc matched /USDC case-insensitively and redirected to itself forever.
 
       // ── Invalid network slugs ──
       { source: '/cbbtc/eth', destination: '/cbbtc', permanent: true },
