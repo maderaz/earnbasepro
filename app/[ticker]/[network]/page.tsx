@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { networkFilterSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
+import { NetworkFilterClient } from './network-filter-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,7 +62,8 @@ export default async function NetworkPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <div className="space-y-10">
+      {/* SSR skeleton */}
+      <div id="network-filter-seo-content" className="space-y-10">
         <nav className="text-sm text-muted-foreground">
           <a href="/" className="hover:text-foreground">Home</a>
           <span className="mx-1">/</span>
@@ -116,6 +118,14 @@ export default async function NetworkPage({ params }: Props) {
           </a>
         </section>
       </div>
+
+      {/* Interactive client */}
+      <NetworkFilterClient
+        ticker={t}
+        network={netSlug}
+        networkName={netName}
+        products={JSON.parse(JSON.stringify(products))}
+      />
     </>
   );
 }
