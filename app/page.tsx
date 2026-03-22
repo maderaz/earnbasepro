@@ -189,7 +189,7 @@ export default async function HomePage() {
                 </tr>
               </thead>
               <tbody>
-                {homeProducts.slice(0, 50).map((p, i) => (
+                {homeProducts.map((p, i) => (
                   <tr key={p.id || i} className="border-b border-border/50 hover:bg-muted/30">
                     <td className="py-3 pr-4">
                       <a href={`/vault/${p.url || ''}`} className="text-foreground font-medium hover:text-[#08a671] transition-colors">
@@ -210,11 +210,6 @@ export default async function HomePage() {
               </tbody>
             </table>
           </div>
-          {homeProducts.length > 50 && (
-            <p className="text-xs text-muted-foreground mt-3">
-              Showing top 50 of {homeProducts.length} strategies.
-            </p>
-          )}
         </section>
       </div>
 
