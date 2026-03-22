@@ -9,7 +9,7 @@
 import { RegistryProvider } from './hooks/useRegistry';
 import { HeroSection } from './components/HeroSection';
 import { TrackerTable } from './components/TrackerTable';
-import { TopDeFiYields, HomepageContent } from './components/HomepageContent';
+import { HomepageContent } from './components/HomepageContent';
 import type { DeFiProduct, DisplaySettings } from '@/lib/api';
 
 interface Props {
@@ -24,7 +24,6 @@ export function HomepageClient({ initialProducts, tickers }: Props) {
     <RegistryProvider>
       <div className="space-y-10 lg:space-y-14">
         <HeroSection products={initialProducts} />
-        <TopDeFiYields products={initialProducts} />
         <TrackerTable products={initialProducts} allTickers={tickers} />
         <HomepageContent products={initialProducts} />
       </div>
