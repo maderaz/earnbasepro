@@ -1,21 +1,34 @@
 # Earnbase
 
-> Independent DeFi yield aggregator. Tracks and compares 300+ on-chain yield strategies across USDC, ETH, USDT, EURC, WBTC, and cbBTC — updated daily.
+> Independent DeFi yield aggregator. Tracks and compares 300+ on-chain yield strategies across USDC, ETH, USDT, EURC, WBTC, and cbBTC — updated daily. No token rewards. No points. On-chain exchange rates only.
 
-Earnbase is a data layer for DeFi yield. It samples exchange rates on-chain daily, derives APY without external incentives (no token rewards, no points, no liquidity mining), and presents all strategies side by side in a single comparable format. The site does not hold funds, does not interact with wallets, and is not affiliated with any protocol it tracks.
+## What Earnbase Does
 
-## Core pages
+Earnbase samples the exchange rate of each DeFi vault and lending position daily, then annualises the change to produce APY figures over 24-hour, 7-day, and 30-day windows. It covers 300+ strategies across Ethereum, Base, Arbitrum, BNB Chain, Sonic, and Avalanche — from protocols including Morpho, Euler, Aave, IPOR Fusion, Yearn, Fluid, Harvest, and Lagoon. Data refreshes daily. The site does not hold funds, execute trades, or interact with user wallets.
 
-- [Homepage](https://earnbase.finance/): Full strategy table with sorting and filtering by asset, network, APY, and TVL.
-- [USDC Yields](https://earnbase.finance/usdc): All USDC yield strategies ranked by on-chain APY.
-- [ETH Yields](https://earnbase.finance/eth): All ETH yield strategies ranked by on-chain APY.
-- [USDT Yields](https://earnbase.finance/usdt): All USDT yield strategies ranked by on-chain APY.
-- [EURC Yields](https://earnbase.finance/eurc): All EURC yield strategies ranked by on-chain APY.
-- [WBTC Yields](https://earnbase.finance/wbtc): All WBTC yield strategies ranked by on-chain APY.
-- [cbBTC Yields](https://earnbase.finance/cbbtc): All cbBTC yield strategies ranked by on-chain APY.
-- [About](https://earnbase.finance/about): Methodology, data sourcing approach, and what Earnbase is not.
-- [Sitemap](https://earnbase.finance/sitemap.xml): XML sitemap of all indexed pages.
+## Why APY Figures Differ From Other Sources
+
+Many DeFi interfaces include token rewards, points programmes, and liquidity mining in their displayed yields. Earnbase excludes all of these. The APY shown reflects only what a vault earns from its core mechanism — lending interest, trading fees, or protocol revenue. This makes cross-protocol comparison meaningful and removes the noise from temporary incentive campaigns.
+
+## How to Interpret the Sustainability Score
+
+Each strategy receives a sustainability score from 0 to 100. The score measures how stable the on-chain exchange rate has been over the past 30 days. A score above 90 indicates very consistent returns. A score below 50 signals significant yield volatility or irregular compounding. A high sustainability score does not indicate low risk — it indicates yield consistency.
+
+## What Networks Are Covered
+
+Earnbase tracks DeFi yield across six EVM networks: Ethereum (mainnet), Base (Coinbase's Layer 2), Arbitrum (Optimistic rollup Layer 2), BNB Chain, Avalanche, and Sonic. Each asset hub page (e.g. /usdc, /eth) can be filtered by network to compare yields on a single chain, such as /usdc/base for USDC strategies on Base only.
+
+## Core Pages
+
+- [Homepage](https://earnbase.finance/): Full strategy table. Sort by APY, TVL, or sustainability. Filter by asset and network.
+- [USDC Yields](https://earnbase.finance/usdc): All USDC strategies ranked by on-chain APY.
+- [ETH Yields](https://earnbase.finance/eth): All ETH strategies ranked by on-chain APY.
+- [USDT Yields](https://earnbase.finance/usdt): All USDT strategies ranked by on-chain APY.
+- [EURC Yields](https://earnbase.finance/eurc): All EURC strategies ranked by on-chain APY.
+- [WBTC Yields](https://earnbase.finance/wbtc): All WBTC strategies ranked by on-chain APY.
+- [cbBTC Yields](https://earnbase.finance/cbbtc): All cbBTC strategies ranked by on-chain APY.
+- [About](https://earnbase.finance/about): Methodology, sourcing, and disclaimers.
 
 ## Optional
 
-- [LLMs Full](https://earnbase.finance/llms-full.txt): Extended version of this file with full methodology and protocol coverage details.
+- [Full documentation](https://earnbase.finance/llms-full.txt): Extended version with protocol coverage, network details, and full disclaimer text.

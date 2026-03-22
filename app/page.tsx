@@ -97,7 +97,7 @@ export default async function HomePage() {
       />
 
       {/* SSR content for crawlers — visually hidden from users, always present in DOM HTML for Google */}
-      <div id="homepage-seo-content" aria-hidden="true" className="sr-only">
+      <div id="homepage-seo-content" className="sr-only">
         {/* Hero */}
         <section>
           <h1 className="text-2xl font-semibold text-foreground">

@@ -38,6 +38,7 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#3f7359" />
         <link rel="llms-txt" href="/llms.txt" />
+        <link rel="llms-full-txt" href="/llms-full.txt" />
       </head>
       <body className="bg-background text-foreground antialiased">
         <Layout>{children}</Layout>
