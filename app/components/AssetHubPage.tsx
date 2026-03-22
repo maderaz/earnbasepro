@@ -10,7 +10,7 @@ import {
   Search, ArrowUpDown, ArrowUp, ArrowDown,
   ChevronRight, ChevronUp, Globe, X,
 } from 'lucide-react';
-import { useRegistry } from '@/app/hooks/useRegistry';
+import { useRegistry } from '../hooks/useRegistry';
 import { getProductSlug, slugify } from '@/app/utils/slugify';
 import { formatTVL, formatAPY } from '@/app/utils/formatters';
 import type { DeFiProduct } from '@/lib/api';

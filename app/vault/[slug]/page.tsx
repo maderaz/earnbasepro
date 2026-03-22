@@ -4,7 +4,7 @@ import { vaultProductSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/l
 import type { DeFiProduct } from '@/lib/api';
 import { VaultClient } from './vault-client';
 
-export const revalidate = 300; // ISR: rebuild at most every 5 minutes
+export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
 interface Props { params: Promise<{ slug: string }> }
 

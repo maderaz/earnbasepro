@@ -5,7 +5,7 @@
  */
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { matchesNetwork } from '@/app/utils/assets';
+import { matchesNetwork } from '@/lib/assets';
 import { formatAPY } from '@/app/utils/formatters';
 import { slugify, getProductSlug } from '@/app/utils/slugify';
 import type { DeFiProduct } from '@/lib/api';

@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { slugify, getProductSlug } from '@/app/utils/slugify';
-import { matchesNetwork, NETWORKS } from '@/app/utils/assets';
+import { matchesNetwork, NETWORKS } from '@/lib/assets';
 import { formatAPY, formatTVL } from '@/app/utils/formatters';
 import type { DeFiProduct } from '@/lib/api';
 import { ChevronRight, ChevronDown } from 'lucide-react';

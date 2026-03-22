@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
-import { RegistryProvider } from '@/app/hooks/useRegistry';
-import { CuratorPage } from '@/app/components/CuratorPage';
+import { RegistryProvider } from '../../hooks/useRegistry';
+import { CuratorPage } from '../../components/CuratorPageClient';
 import type { DeFiProduct } from '@/lib/api';
 
 interface Props {

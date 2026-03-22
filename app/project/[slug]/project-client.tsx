@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
-import { RegistryProvider } from '@/app/hooks/useRegistry';
-import { ProjectPage } from '@/app/components/ProjectPage';
+import { RegistryProvider } from '../../hooks/useRegistry';
+import { ProjectPage } from '../../components/ProjectPageClient';
 import type { DeFiProduct } from '@/lib/api';
 
 interface Props {

@@ -7,7 +7,7 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowUpDown, ArrowUp, ArrowDown, ChevronRight } from 'lucide-react';
-import { useRegistry } from '@/app/hooks/useRegistry';
+import { useRegistry } from '../hooks/useRegistry';
 import { getProductSlug } from '@/app/utils/slugify';
 import { formatTVL, formatAPY } from '@/app/utils/formatters';
 import type { DeFiProduct } from '@/lib/api';

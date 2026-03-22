@@ -4,7 +4,7 @@ import { homepageSEO, BASE_URL } from '@/lib/seo';
 import { HomepageClient } from './homepage-client';
 
 // SSR at request time — APY data changes frequently
-export const revalidate = 300; // ISR: rebuild at most every 5 minutes
+export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
 /**
  * Homepage — Server Component.

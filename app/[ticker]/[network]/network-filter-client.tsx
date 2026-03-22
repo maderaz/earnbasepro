@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from 'react';
-import { NetworkSEOContent } from '@/app/components/NetworkSEOContent';
+import { NetworkSEOContent } from '../../components/NetworkSEOContent';
 import type { DeFiProduct } from '@/lib/api';
 
 interface Props {

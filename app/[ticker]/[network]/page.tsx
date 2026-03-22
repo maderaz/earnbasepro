@@ -3,7 +3,7 @@ import { fetchPools } from '@/lib/api';
 import { networkFilterSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
 import { NetworkFilterClient } from './network-filter-client';
 
-export const revalidate = 300; // ISR: rebuild at most every 5 minutes
+export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
 interface Props { params: Promise<{ ticker: string; network: string }> }
 

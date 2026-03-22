@@ -4,7 +4,7 @@ import { assetHubSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/s
 import { AssetHubClient } from './asset-hub-client';
 import { AssetSEOContent } from '../components/AssetSEOContent';
 
-export const revalidate = 300; // ISR: rebuild at most every 5 minutes
+export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
 const VALID_TICKERS = ['usdc', 'eth', 'usdt', 'eurc', 'wbtc', 'cbbtc'];
 
