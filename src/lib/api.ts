@@ -3,10 +3,10 @@
  * Mirrors the client-side api.ts but runs on the server during SSR/SSG.
  */
 
-const PROJECT_ID = 'bkjppldzhqhcsqrdqvsn';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJranBwbGR6aHFoY3NxcmRxdnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMzEwNzUsImV4cCI6MjA4NDgwNzA3NX0.D-WETIJOLhGhaBT3p5kYbfD_6vWmTpvatpA15lSSb4c';
+import { SUPABASE_ANON_KEY, SUPABASE_API_URL } from './supabase-config';
 
-const BASE_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/make-server-7b092b69`;
+const ANON_KEY = SUPABASE_ANON_KEY;
+const BASE_URL = SUPABASE_API_URL;
 
 async function request<T = any>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

@@ -1,0 +1,21 @@
+# Earnbase
+
+> Independent DeFi yield aggregator. Tracks and compares 300+ on-chain yield strategies across USDC, ETH, USDT, EURC, WBTC, and cbBTC — updated daily.
+
+Earnbase is a data layer for DeFi yield. It samples exchange rates on-chain daily, derives APY without external incentives (no token rewards, no points, no liquidity mining), and presents all strategies side by side in a single comparable format. The site does not hold funds, does not interact with wallets, and is not affiliated with any protocol it tracks.
+
+## Core pages
+
+- [Homepage](https://earnbase.finance/): Full strategy table with sorting and filtering by asset, network, APY, and TVL.
+- [USDC Yields](https://earnbase.finance/usdc): All USDC yield strategies ranked by on-chain APY.
+- [ETH Yields](https://earnbase.finance/eth): All ETH yield strategies ranked by on-chain APY.
+- [USDT Yields](https://earnbase.finance/usdt): All USDT yield strategies ranked by on-chain APY.
+- [EURC Yields](https://earnbase.finance/eurc): All EURC yield strategies ranked by on-chain APY.
+- [WBTC Yields](https://earnbase.finance/wbtc): All WBTC yield strategies ranked by on-chain APY.
+- [cbBTC Yields](https://earnbase.finance/cbbtc): All cbBTC yield strategies ranked by on-chain APY.
+- [About](https://earnbase.finance/about): Methodology, data sourcing approach, and what Earnbase is not.
+- [Sitemap](https://earnbase.finance/sitemap.xml): XML sitemap of all indexed pages.
+
+## Optional
+
+- [LLMs Full](https://earnbase.finance/llms-full.txt): Extended version of this file with full methodology and protocol coverage details.

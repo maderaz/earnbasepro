@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { fetchPools, fetchDisplaySettings } from '@/lib/api';
-import { homepageSEO, BASE_URL } from '@/lib/seo';
+import { homepageSEO, BASE_URL, formatTVLCompact } from '@/lib/seo';
 import { HomepageClient } from './homepage-client';
 
 // SSR at request time — APY data changes frequently
@@ -242,8 +242,3 @@ function getTopPerAsset(products: any[]) {
     .map(t => map.get(t)!);
 }
 
-function formatTVLCompact(tvl: number): string {
-  if (tvl >= 1_000_000) return `$${(tvl / 1_000_000).toFixed(1)}M`;
-  if (tvl >= 1_000) return `$${(tvl / 1_000).toFixed(1)}K`;
-  return `$${tvl.toFixed(0)}`;
-}

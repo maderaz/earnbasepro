@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@EarnbaseFinance',
   },
   icons: {
     icon: '/favicon.png',
@@ -36,7 +37,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#3f7359" />
-        <link rel="llms-txt" href="https://files.earnbase.finance/llms.txt" />
+        <link rel="llms-txt" href="/llms.txt" />
       </head>
       <body className="bg-background text-foreground antialiased">
         <Layout>{children}</Layout>

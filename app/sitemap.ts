@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { fetchPools } from '@/lib/api';
 import { BASE_URL, getProductSlug } from '@/lib/seo';
-
-const VALID_TICKERS = ['usdc', 'eth', 'usdt', 'eurc', 'wbtc', 'cbbtc'];
+import { VALID_TICKERS } from '@/lib/constants';
 
 function nameToSlug(name: string): string {
   return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');

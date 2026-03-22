@@ -197,9 +197,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </svg>
               </a>
               <div className="flex items-center gap-3 text-[11px] text-white/45">
-                <a href="https://files.earnbase.finance/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Sitemap</a>
+                <a href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</a>
                 <span className="text-white/20">&middot;</span>
-                <a href="https://files.earnbase.finance/llms.txt" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LLMs.txt</a>
+                <a href="/llms.txt" className="hover:text-white transition-colors">LLMs.txt</a>
                 <span className="text-white/20">&middot;</span>
                 <Link href="/about" className="hover:text-white transition-colors">About</Link>
                 <span className="text-white/20">&middot;</span>

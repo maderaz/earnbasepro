@@ -2,12 +2,11 @@ import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { assetHubSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
 import { computeAssetHubVars, buildAssetHubFaq } from '@/lib/assetSEOData';
+import { VALID_TICKERS } from '@/lib/constants';
 import { AssetHubClient } from './asset-hub-client';
 import { AssetSEOContent } from '../components/AssetSEOContent';
 
 export const dynamic = 'force-dynamic';
-
-const VALID_TICKERS = ['usdc', 'eth', 'usdt', 'eurc', 'wbtc', 'cbbtc'];
 
 interface Props { params: Promise<{ ticker: string }> }
 
