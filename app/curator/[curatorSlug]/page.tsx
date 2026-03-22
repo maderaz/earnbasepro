@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { curatorPageSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
+import { CuratorClient } from './curator-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,7 +77,8 @@ export default async function CuratorPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <div className="space-y-10">
+      {/* SSR skeleton */}
+      <div id="curator-seo-content" className="space-y-10">
         <nav className="text-sm text-muted-foreground">
           <a href="/" className="hover:text-foreground">Home</a>
           <span className="mx-1">/</span>
@@ -163,6 +165,12 @@ export default async function CuratorPage({ params }: Props) {
           </div>
         </section>
       </div>
+
+      {/* Interactive client */}
+      <CuratorClient
+        curatorSlug={curatorSlug}
+        products={JSON.parse(JSON.stringify(products))}
+      />
     </>
   );
 }
