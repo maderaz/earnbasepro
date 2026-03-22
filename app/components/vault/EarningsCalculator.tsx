@@ -106,7 +106,7 @@ export const EarningsCalculator: React.FC<EarningsCalculatorProps> = ({ apy, tic
       <p className="mt-3 text-[10px] leading-relaxed text-[#52525b] dark:text-foreground/40 font-normal">
         {isPrivateCredit
           ? `For illustrative purposes only. Based on the current ${apy.toFixed(2)}% on-chain APY for ${ticker.toUpperCase()}. This is a fixed-rate product.`
-          : `For illustrative purposes only. Based on the current ${apy.toFixed(2)}% on-chain APY for ${ticker.toUpperCase()}. Does not include external incentives. Past performance does not guarantee future results.`
+          : `For illustrative purposes only. Based on the current ${apy.toFixed(2)}% on-chain APY for ${ticker.toUpperCase()}. Does not include external incentives. Past performance does not guarantee future results. Actual returns may vary.`
         }
       </p>
     </div>
