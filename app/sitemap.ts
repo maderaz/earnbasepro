@@ -42,13 +42,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Network filter pages: /{ticker}/{network}
+  // For Ethereum Mainnet products, emit both /ethereum and /mainnet slugs —
+  // /mainnet is a legacy alias still indexed by Google.
   const networkKeys = new Set<string>();
   const networkUrls: MetadataRoute.Sitemap = [];
-  for (const p of products) {
-    const ticker = (p.ticker || '').toLowerCase();
-    if (!VALID_TICKERS.includes(ticker)) continue;
-    const netSlug = networkToSlug(p.network || '');
-    if (!netSlug) continue;
+
+  function addNetworkUrl(ticker: string, netSlug: string) {
     const key = `${ticker}/${netSlug}`;
     if (!networkKeys.has(key)) {
       networkKeys.add(key);
@@ -56,8 +55,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${BASE_URL}/${ticker}/${netSlug}`,
         lastModified: now,
         changeFrequency: 'daily',
-        priority: 0.7,
+        priority: 0.8,
       });
+    }
+  }
+
+  for (const p of products) {
+    const ticker = (p.ticker || '').toLowerCase();
+    if (!VALID_TICKERS.includes(ticker)) continue;
+    const netSlug = networkToSlug(p.network || '');
+    if (!netSlug) continue;
+    addNetworkUrl(ticker, netSlug);
+    // Also emit the /mainnet alias for Ethereum Mainnet pages (legacy indexed URLs)
+    if (netSlug === 'ethereum') {
+      addNetworkUrl(ticker, 'mainnet');
     }
   }
 
@@ -68,7 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}/vault/${getProductSlug(p)}`,
       lastModified: now,
       changeFrequency: 'daily',
-      priority: 0.8,
+      priority: 0.7,
     }));
 
   // Project pages: /project/{slug} — platform_name with ≥2 products
@@ -84,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${BASE_URL}/project/${slug}`,
         lastModified: now,
         changeFrequency: 'weekly',
-        priority: 0.7,
+        priority: 0.8,
       });
     }
   }
@@ -103,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${BASE_URL}/curator/${slug}`,
         lastModified: now,
         changeFrequency: 'weekly',
-        priority: 0.7,
+        priority: 0.8,
       });
     }
   }
