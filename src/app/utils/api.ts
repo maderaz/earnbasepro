@@ -1,5 +1,5 @@
 /** Centralized API client for Earnbase. */
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 
 const BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-7b092b69`;
 

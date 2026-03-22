@@ -41,6 +41,7 @@ interface RegistryContextType {
   resolveNetworkName: (network: string) => string;
   matchesNetwork: (productNetwork: string, filterNetwork: string) => boolean;
   getAllNetworks: () => NetworkOption[];
+  refreshRegistry: () => Promise<void>;
 }
 
 const defaultMatchesNetwork = (productNetwork: string, filterNetwork: string): boolean => {
@@ -57,6 +58,7 @@ const RegistryContext = createContext<RegistryContextType>({
   resolveNetworkName: (n) => n,
   matchesNetwork: defaultMatchesNetwork,
   getAllNetworks: () => NETWORK_CONFIG.map(n => ({ id: n.id, name: n.name, icon: null })),
+  refreshRegistry: async () => {},
 });
 
 export function RegistryProvider({ children }: { children: React.ReactNode }) {
@@ -148,13 +150,25 @@ export function RegistryProvider({ children }: { children: React.ReactNode }) {
     }));
   }, [resolveNetworkIcon]);
 
+  const refreshRegistry = useCallback(async (): Promise<void> => {
+    try {
+      const r = await fetch(`${BASE_URL}/registry`, {
+        headers: { 'Authorization': `Bearer ${ANON_KEY}`, 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      });
+      const data = await r.json();
+      if (data.assets) setAssets(data.assets);
+      if (data.networks) setNetworks(data.networks);
+    } catch {}
+  }, []);
+
   const value = useMemo(() => ({
     resolveAssetIcon,
     resolveNetworkIcon,
     resolveNetworkName,
     matchesNetwork,
     getAllNetworks,
-  }), [resolveAssetIcon, resolveNetworkIcon, resolveNetworkName, matchesNetwork, getAllNetworks]);
+    refreshRegistry,
+  }), [resolveAssetIcon, resolveNetworkIcon, resolveNetworkName, matchesNetwork, getAllNetworks, refreshRegistry]);
 
   return <RegistryContext.Provider value={value}>{children}</RegistryContext.Provider>;
 }
