@@ -12,7 +12,8 @@ export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeo
  */
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const tickers = [...new Set(products.map(p => (p.ticker || '').toUpperCase()))].sort();
   const seo = homepageSEO(tickers, products.length);
 
@@ -35,10 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [poolsData, displaySettings] = await Promise.all([
-    fetchPools(),
-    fetchDisplaySettings(),
-  ]);
+  let poolsData: Awaited<ReturnType<typeof fetchPools>> = { products: [], rule5Exclusions: [], privateCreditIds: [] };
+  try { poolsData = await fetchPools(); } catch { /* network unavailable */ }
+  const displaySettings = await fetchDisplaySettings();
 
   const { products } = poolsData;
 

@@ -5,7 +5,8 @@ import { aboutPageSEO, BASE_URL } from '@/lib/seo';
 export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const seo = aboutPageSEO(products.length);
   const pageUrl = `${BASE_URL}/about`;
 
@@ -19,7 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const seo = aboutPageSEO(products.length);
 
   const assetCount = new Set(products.map(p => (p.ticker || '').toUpperCase())).size;

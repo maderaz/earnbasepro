@@ -17,7 +17,8 @@ function nameToSlug(name: string): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { curatorSlug } = await params;
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const curatorName = slugToName(curatorSlug);
   const filtered = products.filter(p =>
     p.curator && nameToSlug(p.curator.trim()) === curatorSlug
@@ -43,7 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CuratorPage({ params }: Props) {
   const { curatorSlug } = await params;
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const curatorName = slugToName(curatorSlug);
   const filtered = products.filter(p =>
     p.curator && nameToSlug(p.curator.trim()) === curatorSlug

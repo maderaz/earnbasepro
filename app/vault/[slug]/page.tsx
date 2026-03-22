@@ -14,7 +14,8 @@ function findProduct(products: DeFiProduct[], slug: string): DeFiProduct | undef
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const product = findProduct(products, slug);
 
   if (!product) {
@@ -41,7 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VaultPage({ params }: Props) {
   const { slug } = await params;
-  const { products, privateCreditIds } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  let privateCreditIds: Awaited<ReturnType<typeof fetchPools>>['privateCreditIds'] = [];
+  try { ({ products, privateCreditIds } = await fetchPools()); } catch { /* network unavailable */ }
   const product = findProduct(products, slug);
 
   if (!product) {

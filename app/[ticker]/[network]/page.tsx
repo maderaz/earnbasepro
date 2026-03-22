@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const netSlug = network.toLowerCase();
   const netName = networkDisplayName(netSlug);
 
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const T = t.toUpperCase();
   const filtered = products.filter(p =>
     (p.ticker || '').toUpperCase() === T && matchNetwork(p.network, netSlug)
@@ -51,7 +52,8 @@ export default async function NetworkPage({ params }: Props) {
   const netSlug = network.toLowerCase();
   const netName = networkDisplayName(netSlug);
 
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const filtered = products.filter(p =>
     (p.ticker || '').toUpperCase() === T && matchNetwork(p.network, netSlug)
   );

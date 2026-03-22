@@ -17,7 +17,8 @@ function nameToSlug(name: string): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const projectName = slugToName(slug);
   const filtered = products.filter(p =>
     nameToSlug((p.platform_name || '').trim()) === slug
@@ -43,7 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const projectName = slugToName(slug);
   const filtered = products.filter(p =>
     nameToSlug((p.platform_name || '').trim()) === slug

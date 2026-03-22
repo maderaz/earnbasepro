@@ -17,7 +17,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Page Not Found | Earnbase' };
   }
 
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const T = t.toUpperCase();
   const filtered = products.filter(p => (p.ticker || '').toUpperCase() === T);
   const networks = new Set(filtered.map(p => p.network));
@@ -43,7 +44,8 @@ export default async function AssetHubPage({ params }: Props) {
     return <NotFound />;
   }
 
-  const { products } = await fetchPools();
+  let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
+  try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
   const filtered = products.filter(p => (p.ticker || '').toUpperCase() === T);
   const sorted = [...filtered].sort((a, b) => b.spotAPY - a.spotAPY);
   const networks = new Set(filtered.map(p => p.network));
