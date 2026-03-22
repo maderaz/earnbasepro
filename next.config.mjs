@@ -14,6 +14,7 @@ const nextConfig = {
       // ── Garbage URLs ──
       { source: '/%24', destination: '/', permanent: true },
       { source: '/%26', destination: '/', permanent: true },
+      { source: '/sitemap', destination: '/', permanent: true },
 
       // NOTE: uppercase ticker redirects removed — Next.js routes are case-insensitive
       // (caseSensitive:false in routes-manifest) so /USDC→/usdc was creating a redirect
