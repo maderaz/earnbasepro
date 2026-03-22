@@ -16,6 +16,7 @@ async function request<T = any>(path: string): Promise<T> {
       'Content-Type': 'application/json',
     },
     next: { revalidate: 300 }, // Cache for 5 minutes
+    signal: AbortSignal.timeout(8000), // Fail fast after 8 s
   });
 
   if (!res.ok) {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { aboutPageSEO, BASE_URL } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // ISR: rebuild at most every 5 minutes
 
 export async function generateMetadata(): Promise<Metadata> {
   const { products } = await fetchPools();

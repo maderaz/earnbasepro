@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { assetHubSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
 import { AssetHubClient } from './asset-hub-client';
+import { AssetSEOContent } from '../components/AssetSEOContent';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // ISR: rebuild at most every 5 minutes
 
 const VALID_TICKERS = ['usdc', 'eth', 'usdt', 'eurc', 'wbtc', 'cbbtc'];
 
@@ -137,6 +138,9 @@ export default async function AssetHubPage({ params }: Props) {
         products={JSON.parse(JSON.stringify(products))}
         allTickers={allTickers}
       />
+
+      {/* SEO editorial content */}
+      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(products))} />
     </>
   );
 }

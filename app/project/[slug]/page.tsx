@@ -3,7 +3,7 @@ import { fetchPools } from '@/lib/api';
 import { projectPageSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
 import { ProjectClient } from './project-client';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // ISR: rebuild at most every 5 minutes
 
 interface Props { params: Promise<{ slug: string }> }
 
