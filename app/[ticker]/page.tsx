@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { assetHubSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
+import { AssetHubClient } from './asset-hub-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,11 +51,17 @@ export default async function AssetHubPage({ params }: Props) {
 
   const seo = assetHubSEO(t, filtered.length, networks.size, sorted);
 
+  // Compute allTickers sorted by product count (for mobile asset switcher)
+  const tickerCounts = new Map<string, number>();
+  products.forEach(p => tickerCounts.set(p.ticker.toUpperCase(), (tickerCounts.get(p.ticker.toUpperCase()) || 0) + 1));
+  const allTickers = [...tickerCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
 
-      <div className="space-y-10">
+      {/* SSR skeleton */}
+      <div id="asset-hub-seo-content" className="space-y-10">
         <section>
           <h1 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yield Strategies
@@ -123,6 +130,13 @@ export default async function AssetHubPage({ params }: Props) {
           </div>
         </section>
       </div>
+
+      {/* Interactive client */}
+      <AssetHubClient
+        ticker={t}
+        products={JSON.parse(JSON.stringify(products))}
+        allTickers={allTickers}
+      />
     </>
   );
 }
