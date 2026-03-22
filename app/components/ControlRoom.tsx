@@ -21,6 +21,7 @@ import { HiddenProductsPanel } from './HiddenProductsPanel';
 import { PrivateCreditPanel } from './PrivateCreditPanel';
 import { AnalyticsPanel } from './AnalyticsPanel';
 import { DashboardPanel } from './DashboardPanel';
+import { IconsPanel } from './IconsPanel';
 
 // ─── Platform Strategies Table ───────────────────────────────
 const PlatformStrategiesTable: React.FC = () => {
@@ -89,7 +90,7 @@ const PlatformStrategiesTable: React.FC = () => {
   );
 };
 
-type SectionTab = 'dashboard' | 'registry' | 'rules' | 'clicks' | 'searches' | 'clients' | 'traffic' | 'hidden' | 'private-credit' | 'analytics';
+type SectionTab = 'dashboard' | 'registry' | 'icons' | 'rules' | 'clicks' | 'searches' | 'clients' | 'traffic' | 'hidden' | 'private-credit' | 'analytics';
 
 // ─── Types ───────────────────────────────────────────────────
 interface TabConfig {
@@ -701,6 +702,17 @@ export const ControlRoom: React.FC = () => {
             Registry
           </button>
           <button
+            onClick={() => setSectionTab('icons')}
+            className={`flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              sectionTab === 'icons'
+                ? 'bg-card text-foreground shadow-sm border border-border'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+            Icons
+          </button>
+          <button
             onClick={() => setSectionTab('rules')}
             className={`flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               sectionTab === 'rules'
@@ -759,6 +771,9 @@ export const ControlRoom: React.FC = () => {
 
       {/* ═══ Private Credit Section ═══ */}
       {sectionTab === 'private-credit' && <PrivateCreditPanel />}
+
+      {/* ═══ Icons Section ═══ */}
+      {sectionTab === 'icons' && <IconsPanel />}
 
       {/* ═══ Rules Section ═══ */}
       {sectionTab === 'rules' && <ControlRoomRules />}
