@@ -180,7 +180,6 @@ export const LayoutTopNav: React.FC<LayoutTopNavProps> = ({
                     { label: 'Re7', slug: 're7' },
                     { label: 'Clearstar', slug: 'clearstar' },
                     { label: 'MEV Capital', slug: 'mev-capital' },
-                    { label: 'Apostro', slug: 'apostro' },
                   ].map(c => (
                     <li key={c.slug}>
                       <Link to={`/curator/${c.slug}`} className="text-[13px] text-white/55 hover:text-white transition-colors">
