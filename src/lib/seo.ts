@@ -126,6 +126,27 @@ export function homepageSEO(tickers: string[], totalStrategies: number) {
     });
   }
 
+  graph.push({
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is Earnbase?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Earnbase is an independent DeFi yield aggregator that tracks and compares on-chain APY for yield strategies across USDC, ETH, USDT, EURC, WBTC, and cbBTC. It covers 300+ strategies across Ethereum, Base, Arbitrum, BNB Chain, and other networks — sourced from protocols including Morpho, Euler, Aave, IPOR Fusion, Yearn, and Fluid. Earnbase does not hold user funds or execute trades.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is APY calculated on Earnbase?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Earnbase samples the exchange rate of each vault or lending position daily and annualises the change to produce APY figures over 24-hour and 30-day windows. External incentives, token rewards, points programmes, and liquidity mining bonuses are excluded. The displayed APY reflects only what the vault earns from its core on-chain mechanism.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which DeFi protocols does Earnbase track?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Earnbase tracks yield strategies from Morpho, Euler, Aave, IPOR Fusion, Yearn, Fluid, Harvest, Lagoon, Wildcat, and 25+ other protocols. New protocols are added as they gain liquidity and verifiable on-chain exchange rate data.' },
+      },
+    ],
+  });
+
   return {
     title,
     description,
