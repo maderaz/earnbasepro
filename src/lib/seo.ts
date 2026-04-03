@@ -273,7 +273,7 @@ export function vaultProductSEO(
       { '@type': 'ListItem', position: 4, name: `${productName} (${platform})` },
     ]},
     {
-      '@type': 'FinancialProduct', name: productName, url: pageUrl, dateModified: new Date().toISOString(),
+      '@type': 'FinancialProduct', name: productName, url: pageUrl,
       description: showAPY
         ? `${productName} on ${platform} generates ${apy} on-chain APY on ${T} (${network}). TVL: ${tvlStr}. Yield data tracked daily on Earnbase.`
         : `${productName} on ${platform}: ${T} yield strategy on ${network}. TVL: ${tvlStr}. Yield data tracked daily on Earnbase.`,
@@ -281,7 +281,6 @@ export function vaultProductSEO(
       ...(hasCurator ? { broker: { '@type': 'Organization', name: curator! } } : {}),
       category: 'DeFi Vault',
       interestRate: { '@type': 'QuantitativeValue', value: currentAPY.toFixed(2), unitText: 'PERCENT', name: '24h APY' },
-      amount: { '@type': 'MonetaryAmount', currency: T, value: tvlStr, name: 'Total Value Locked' },
     },
   ];
 
