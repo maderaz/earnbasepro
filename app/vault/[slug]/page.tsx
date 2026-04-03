@@ -13,6 +13,19 @@ function findProduct(products: DeFiProduct[], slug: string): DeFiProduct | undef
 }
 
 function buildVaultFaq(product: DeFiProduct, T: string): { question: string; answer: string }[] {
+  const hasCurator = product.curator && product.curator !== '-' && product.curator.trim() !== '';
+  const curator = hasCurator ? product.curator!.trim() : null;
+
+  const fourthQuestion = curator
+    ? {
+        question: `Who curates ${product.product_name}?`,
+        answer: `${product.product_name} is curated by ${curator}. Curators set the risk parameters, asset allocations, and rebalancing strategy for the vault. They are responsible for selecting which lending markets or protocols receive deposits. You can view all strategies curated by ${curator} on the ${curator} curator page on Earnbase.`,
+      }
+    : {
+        question: `Which network is ${product.product_name} deployed on?`,
+        answer: `${product.product_name} is deployed on ${product.network}. Network choice affects transaction costs, settlement speed, and which protocols are available. On-chain APY figures on Earnbase are calculated from exchange rate data on ${product.network} directly.`,
+      };
+
   return [
     {
       question: `What is the current APY for ${product.product_name}?`,
@@ -26,6 +39,7 @@ function buildVaultFaq(product: DeFiProduct, T: string): { question: string; ans
       question: `Does the ${product.product_name} yield include token rewards?`,
       answer: `No. Earnbase tracks on-chain APY only, derived from the vault's exchange rate changes over time. External incentives, token rewards, points programs, and liquidity mining bonuses are not included in the reported APY.`,
     },
+    fourthQuestion,
   ];
 }
 
