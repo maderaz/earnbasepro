@@ -115,7 +115,12 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
           <h2 className="text-[17px] font-medium text-[#141414] dark:text-foreground mb-3">Market Benchmarking</h2>
           <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mb-4">
             {spotAPY > 0 ? (
-              <span>Within the <span className="font-medium">{product.ticker}</span> ecosystem, this product ranks <span className="font-medium">#{marketStats.rank}</span> out of {marketStats.totalInAsset} {pluralize(marketStats.totalInAsset, 'strategy', 'strategies')}. {comparisonText}</span>
+              <span>
+                Within the <span className="font-medium">{product.ticker}</span> ecosystem, this product ranks <span className="font-medium">#{marketStats.rank}</span> out of {marketStats.totalInAsset} {pluralize(marketStats.totalInAsset, 'strategy', 'strategies')}. {comparisonText}
+                {marketStats.isAboveAverage && marketStats.rank > 1 && (
+                  <span> While not the highest available, this strategy outperforms the majority of tracked {product.ticker} opportunities.</span>
+                )}
+              </span>
             ) : (
               <span>No yield data available. This product is tracked within the <span className="font-medium">{product.ticker}</span> ecosystem alongside {marketStats.totalInAsset} {pluralize(marketStats.totalInAsset, 'strategy', 'strategies')}.</span>
             )}
@@ -170,6 +175,17 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
             <span className="w-20 text-right shrink-0 hidden sm:block" />
           </div>
         </div>
+        {(() => {
+          const higherTvlNeighbors = comparativeRankings.filter(r => r.product.id !== product.id && r.product.tvl > product.tvl * 1.5);
+          if (higherTvlNeighbors.length === 0) return null;
+          const top = higherTvlNeighbors.sort((a, b) => b.product.tvl - a.product.tvl)[0];
+          return (
+            <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mt-3">
+              {product.product_name} currently ranks #{marketStats.rank} among {marketStats.totalInAsset} monitored {product.ticker} strategies.
+              {' '}However, with a TVL of {formatTVL(product.tvl)}, it holds significantly less capital than higher-TVL alternatives like {top.product.product_name} ({formatTVL(top.product.tvl)}).
+            </p>
+          );
+        })()}
       </div>
     )}
 
@@ -180,14 +196,23 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
       return (
         <div>
           <h2 className="text-[17px] font-medium text-[#141414] dark:text-foreground mb-3">Ecosystem Context</h2>
-          <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7]">
-            Positioned within the <span className="font-medium">{product.network}</span> ecosystem, this product's yield is{' '}
-            <span className="text-[#08a671] font-medium">{Math.abs(contextAnalysis.netDiff).toFixed(1)}% {contextAnalysis.netDiff >= 0 ? 'higher' : 'lower'}</span>{' '}
-            than the network average for {product.ticker} strategies.
-            {contextAnalysis.isBestOnNetwork && ` Currently the highest-yielding ${product.ticker} opportunity on ${product.network} among ${contextAnalysis.netCount} tracked products.`}
-            {hasCurator && curatorProducts.length > 0 && ` This strategy is curated by ${product.curator}, with ${curatorProducts.length} strategies tracked on Earnbase.`}
-            {networkTvlRank && ` By TVL, this product ranks #${networkTvlRank.networkTvlRank} of ${networkTvlRank.networkTvlTotal} ${product.ticker} strategies on ${product.network}.`}
-          </p>
+          {(() => {
+            const curatorNetworks = hasCurator
+              ? new Set(curatorProducts.map(p => p.network)).size
+              : 0;
+            const samePlatformTicker = products.filter(p => p.platform_name === product.platform_name && p.ticker === product.ticker && p.id !== product.id).length;
+            return (
+              <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7]">
+                Positioned within the <span className="font-medium">{product.network}</span> ecosystem, this product's yield is{' '}
+                <span className="text-[#08a671] font-medium">{Math.abs(contextAnalysis.netDiff).toFixed(1)}% {contextAnalysis.netDiff >= 0 ? 'higher' : 'lower'}</span>{' '}
+                than the network average for {product.ticker} strategies.
+                {contextAnalysis.isBestOnNetwork && ` Currently the highest-yielding ${product.ticker} opportunity on ${product.network} among ${contextAnalysis.netCount} tracked products.`}
+                {hasCurator && curatorProducts.length > 0 && ` This strategy is curated by ${product.curator}, with ${curatorProducts.length} ${product.curator} strategies tracked on Earnbase${curatorNetworks > 1 ? ` across ${curatorNetworks} networks` : ''}.`}
+                {samePlatformTicker > 0 && ` Within ${product.platform_name}, it competes against ${samePlatformTicker} other ${product.ticker} ${pluralize(samePlatformTicker, 'strategy', 'strategies')}.`}
+                {networkTvlRank && ` By TVL, this product ranks #${networkTvlRank.networkTvlRank} of ${networkTvlRank.networkTvlTotal} ${product.ticker} strategies on ${product.network}.`}
+              </p>
+            );
+          })()}
         </div>
       );
     })()}
@@ -209,9 +234,15 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
     {/* Network Positioning */}
     {networkRankings.length > 1 && contextAnalysis && (
       <div>
-        <h2 className="text-[17px] font-medium text-[#141414] dark:text-foreground mb-3">
-          {product.ticker.toUpperCase()} on {product.network}
-        </h2>
+        {(() => {
+          const myRank = networkRankings.find(r => r.product.id === product.id);
+          return (
+            <h2 className="text-[17px] font-medium text-[#141414] dark:text-foreground mb-3">
+              {product.ticker.toUpperCase()} on {product.network}
+              {myRank && <span className="ml-2 text-[13px] font-normal text-[#a0a0b0]">#{myRank.rank} of {contextAnalysis.netCount}</span>}
+            </h2>
+          );
+        })()}
         <div className="mb-3">
           {networkRankings.map(r => {
             const isCurrent = r.product.id === product.id;
@@ -221,6 +252,7 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className={`text-[12px] font-medium tabular-nums w-6 shrink-0 ${isCurrent ? 'text-[#08a671]' : 'text-[#a0a0b0]'}`}>#{r.rank}</span>
                   <span className={`text-[13px] font-medium truncate ${isCurrent ? 'text-[#08a671]' : 'text-[#30313e] dark:text-foreground/80 group-hover:text-[#08a671]'}`}>{r.product.product_name}</span>
+                  {isCurrent && <span className="text-[9px] font-bold text-[#08a671] bg-[#08a671]/10 px-1.5 py-0.5 rounded-full ml-1 shrink-0 uppercase tracking-wider">You are here</span>}
                 </div>
                 <span className={`text-[13px] font-medium tabular-nums shrink-0 ${isCurrent ? 'text-[#08a671]' : 'text-[#09090b] dark:text-foreground/80'}`}>{r.product.spotAPY.toFixed(2)}%</span>
               </Link>
@@ -287,7 +319,10 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
           </div>
         ) : (
           <div>
-            <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mb-4">{sustainabilityMetrics.description}</p>
+            <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mb-4">
+              {sustainabilityMetrics.description}
+              {(sustainabilityMetrics.score ?? 100) < 35 && ' This pattern is often driven by temporary incentive programs, one-off events, or rapid capital reallocation.'}
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-16">
               <div>
                 <KVRow label="Sustainability Score" tooltip={SUSTAINABILITY['Sustainability Score']} value={
@@ -314,18 +349,37 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
       <div>
         <h2 className="text-[17px] font-medium text-[#141414] dark:text-foreground mb-3">Yield Trajectory</h2>
         {!isPrivateCredit && (
-          <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mb-4">
-            {yieldTrajectory.streakCount <= 1
-              ? `${product.product_name} recorded a 24h APY of ${product.spotAPY.toFixed(2)}% in the most recent data point.`
-              : `${product.product_name} has been on a ${yieldTrajectory.streakCount}-day ${yieldTrajectory.streakDirection} streak.`
-            }
-            {' '}Over the past {yieldTrajectory.totalDays} days, the product delivered positive yields on {yieldTrajectory.daysPositive} out of {yieldTrajectory.totalDays} days.
-            {' '}Current APY of {product.spotAPY.toFixed(2)}% is{' '}
-            <span className={`font-medium ${yieldTrajectory.currentVs30dAvg >= 0 ? 'text-[#08a671]' : 'text-amber-600'}`}>
-              {Math.abs(yieldTrajectory.currentVs30dAvg).toFixed(1)}% {yieldTrajectory.currentVs30dAvg >= 0 ? 'above' : 'below'}
-            </span>{' '}
-            the product's own 30-day average.
-          </p>
+          <>
+            <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mb-4">
+              {yieldTrajectory.streakCount <= 1
+                ? `${product.product_name} recorded a 24h APY of ${product.spotAPY.toFixed(2)}% in the most recent data point.`
+                : `${product.product_name} has been on a ${yieldTrajectory.streakCount}-day ${yieldTrajectory.streakDirection} streak${yieldTrajectory.streakCount >= 2 ? `, with APY ${yieldTrajectory.streakDirection === 'downward' ? 'falling' : 'rising'} from ${yieldTrajectory.streakStartApy.toFixed(2)}% to ${yieldTrajectory.streakEndApy.toFixed(2)}% over this period` : ''}.`
+              }
+              {' '}Over the past {yieldTrajectory.totalDays} days, the product delivered positive yields on {yieldTrajectory.daysPositive} out of {yieldTrajectory.totalDays} days.
+              {yieldTrajectory.weeklyAverages.length >= 2 && (
+                <> Week-over-week, yields have {yieldTrajectory.wowChange >= 0 ? 'increased' : 'declined'} by {Math.abs(yieldTrajectory.wowChange).toFixed(1)}%.{' '}
+                {yieldTrajectory.bestWeek && yieldTrajectory.worstWeek && yieldTrajectory.bestWeek.startDate !== yieldTrajectory.worstWeek.startDate && (
+                  <>The strongest 7-day period was {yieldTrajectory.bestWeek.startDate}–{yieldTrajectory.bestWeek.endDate} averaging {yieldTrajectory.bestWeek.avg.toFixed(2)}%, while the weakest was {yieldTrajectory.worstWeek.startDate}–{yieldTrajectory.worstWeek.endDate} at {yieldTrajectory.worstWeek.avg.toFixed(2)}%.</>
+                )}
+                </>
+              )}
+              {' '}Current 24h APY of {product.spotAPY.toFixed(2)}% is{' '}
+              <span className={`font-medium ${yieldTrajectory.currentVs30dAvg >= 0 ? 'text-[#08a671]' : 'text-amber-600'}`}>
+                {Math.abs(yieldTrajectory.currentVs30dAvg).toFixed(1)}% {yieldTrajectory.currentVs30dAvg >= 0 ? 'above' : 'below'}
+              </span>{' '}
+              the product's own 30-day average.
+            </p>
+            {yieldTrajectory.weeklyAverages.length >= 2 && yieldTrajectory.consecutiveWeeksCount > 0 && (
+              <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7] mb-4">
+                {yieldTrajectory.consecutiveWeeksDirection === 'improved'
+                  ? `Weekly yields have improved for ${yieldTrajectory.consecutiveWeeksCount} consecutive ${pluralize(yieldTrajectory.consecutiveWeeksCount, 'week')}, with the most recent 7-day average of ${[...yieldTrajectory.weeklyAverages].reverse()[0]?.avg.toFixed(2)}% representing a${yieldTrajectory.consecutiveWeeksCount >= 2 ? ' sustained' : ' mid-range'} weekly performance in the tracked period.`
+                  : yieldTrajectory.consecutiveWeeksDirection === 'declined'
+                    ? `Weekly yields have declined for ${yieldTrajectory.consecutiveWeeksCount} consecutive ${pluralize(yieldTrajectory.consecutiveWeeksCount, 'week')}. The most recent 7-day average stands at ${[...yieldTrajectory.weeklyAverages].reverse()[0]?.avg.toFixed(2)}%.`
+                    : null
+                }
+              </p>
+            )}
+          </>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-16">
           <div>
@@ -398,6 +452,16 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
             {expandedApyStats && <KVRow label="Current Percentile" value={`${expandedApyStats.percentile}th`} tooltip={APY_STATS['Current Percentile']} />}
           </div>
         </div>
+        {historyStats.dataPoints >= 7 && (
+          <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7]">
+            Over the past {historyStats.dataPoints} days, {product.product_name}'s yield has shown a {historyStats.trendDirection} trend,
+            {' '}with yields {historyStats.trendDirection === 'downward' ? 'compressing' : 'expanding'} from {historyStats.earlyAvg.toFixed(2)}% to {historyStats.recentAvg.toFixed(2)}%,
+            {' '}a {Math.abs(historyStats.trendPct).toFixed(1)}% {historyStats.trendDirection === 'downward' ? 'decline' : 'increase'}.
+            {sustainabilityMetrics && !sustainabilityMetrics.insufficientData && (
+              <> The sustainability score of {sustainabilityMetrics.score}/100 aligns with {(sustainabilityMetrics.score ?? 0) < 35 ? 'a reversion from previously unsustainable levels' : (sustainabilityMetrics.score ?? 0) >= 75 ? 'a period of relative yield stability' : 'moderate yield variability'}.</>
+            )}
+          </p>
+        )}
       </div>
     )}
 
@@ -423,6 +487,15 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
             {expandedTvlStats && <KVRow label="Largest Outflow" tooltip={TVL_STATS['Largest Outflow']} value={<span><span className="text-orange-500 font-medium">-{formatTVL(expandedTvlStats.largestOutflow)}</span><span className="ml-1.5 text-[11px] text-[#a0a0b0]">{expandedTvlStats.largestOutflowDate}</span></span>} />}
           </div>
         </div>
+        {tvlStats.dataPoints >= 7 && (
+          <p className="text-[13px] text-[#09090b] dark:text-foreground/80 font-normal leading-[1.7]">
+            Over the past {tvlStats.dataPoints} days, {product.product_name}'s total value locked has experienced a {tvlStats.trendDirection === 'growing' ? 'growth phase' : tvlStats.trendDirection === 'declining' ? 'contraction' : 'period of stability'},{' '}
+            {tvlStats.trendDirection !== 'stable'
+              ? <>{tvlStats.trendDirection === 'growing' ? 'growing' : 'declining'} from {formatTVL(tvlStats.earlyAvg)} to {formatTVL(tvlStats.recentAvg)}, a {Math.abs(tvlStats.trendPct).toFixed(1)}% {tvlStats.trendDirection === 'growing' ? 'increase' : 'reduction'}.</>
+              : <>with TVL remaining relatively steady around {formatTVL(tvlStats.avg)}.</>
+            }
+          </p>
+        )}
       </div>
     )}
   </div>

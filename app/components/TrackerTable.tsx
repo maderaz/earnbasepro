@@ -34,6 +34,9 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
   const [sortConfig, setSortConfig] = useState<{ key: keyof DeFiProduct; direction: 'asc' | 'desc' } | null>(
     { key: 'spotAPY', direction: 'desc' }
   );
+  // Ticker selector — client-side, only active on homepage (no params.ticker)
+  const [selectedTicker, setSelectedTicker] = useState<string>('all');
+
   const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -127,28 +130,81 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
       (p.curator?.toLowerCase() || '').includes(q);
     const matchesNet = checkNetworkMatch(p.network, selectedNetwork);
     const matchesTvl = p.tvl >= minTVL;
-    return matchesSearch && matchesNet && matchesTvl;
-  }), [sortedProducts, searchTerm, selectedNetwork, minTVL, checkNetworkMatch]);
+    // Ticker selector is only active on homepage (no URL ticker param)
+    const matchesTicker = params.ticker || selectedTicker === 'all'
+      ? true
+      : p.ticker?.toUpperCase() === selectedTicker;
+    return matchesSearch && matchesNet && matchesTvl && matchesTicker;
+  }), [sortedProducts, searchTerm, selectedNetwork, minTVL, selectedTicker, params.ticker, checkNetworkMatch]);
 
   // Reset pagination when filters change
-  useEffect(() => { setDisplayCount(100); }, [searchTerm, selectedNetwork, minTVL]);
+  useEffect(() => { setDisplayCount(100); }, [searchTerm, selectedNetwork, minTVL, selectedTicker]);
 
   const visibleProducts = filteredProducts.slice(0, displayCount);
   const hasMore = filteredProducts.length > displayCount;
 
   const showClearFilters = searchTerm !== '' || selectedNetwork !== 'all' || minTVL !== 0 ||
+    (!params.ticker && selectedTicker !== 'all') ||
     pathname.split('/').filter(Boolean).length > 1;
 
   const handleClearFilters = () => {
     setSearchTerm('');
     setSelectedNetwork('all');
     setMinTVL(0);
+    setSelectedTicker('all');
     const parts = pathname.split('/').filter(Boolean);
     if (parts.length > 1) router.push(`/${parts[0]}`);
   };
 
   return (
     <div className="relative w-full">
+
+      {/* Ticker selector row — only on homepage (no URL ticker param) */}
+      {!params.ticker && (
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none mb-3">
+          <div className="flex items-center gap-2 w-max sm:w-auto sm:flex-wrap">
+            {/* ALL pill */}
+            <button
+              disabled={loading}
+              onClick={() => setSelectedTicker('all')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all border ${
+                selectedTicker === 'all'
+                  ? 'bg-foreground text-background border-foreground shadow-sm'
+                  : 'bg-card text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground'
+              }`}
+            >
+              All
+            </button>
+
+            {tickersToDisplay.map(ticker => {
+              const icon = resolveAssetIcon(ticker);
+              const active = selectedTicker === ticker.toUpperCase();
+              return (
+                <button
+                  key={ticker}
+                  disabled={loading}
+                  onClick={() => setSelectedTicker(prev => prev === ticker.toUpperCase() ? 'all' : ticker.toUpperCase())}
+                  className={`flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all border ${
+                    active
+                      ? 'bg-foreground text-background border-foreground shadow-sm'
+                      : 'bg-card text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground'
+                  }`}
+                >
+                  {icon ? (
+                    <img src={icon} alt={ticker} className="w-5 h-5 object-contain shrink-0" />
+                  ) : (
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[9px] font-bold ${active ? 'bg-background/20 text-background' : 'bg-muted text-muted-foreground'}`}>
+                      {ticker[0]}
+                    </div>
+                  )}
+                  {ticker.toUpperCase()}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Desktop filters */}
       <div className="hidden lg:flex flex-wrap bg-card rounded-t-lg border border-border border-b-0 p-4 items-center gap-2">
         <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border shrink-0">

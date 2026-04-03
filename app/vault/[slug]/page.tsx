@@ -12,6 +12,23 @@ function findProduct(products: DeFiProduct[], slug: string): DeFiProduct | undef
   return products.find(p => getProductSlug(p) === slug);
 }
 
+function buildVaultFaq(product: DeFiProduct, T: string): { question: string; answer: string }[] {
+  return [
+    {
+      question: `What is the current APY for ${product.product_name}?`,
+      answer: `The current spot APY for ${product.product_name} on ${product.platform_name} (${product.network}) is ${product.spotAPY.toFixed(2)}%. The 30-day average APY is ${product.monthlyAPY.toFixed(2)}%. All figures exclude external token rewards and are calculated from on-chain exchange rates only.`,
+    },
+    {
+      question: `How much total value is locked in ${product.product_name}?`,
+      answer: `The total value locked (TVL) in ${product.product_name} is ${formatTVLCompact(product.tvl)}. TVL measures the total ${T} assets currently deposited in this vault.`,
+    },
+    {
+      question: `Does the ${product.product_name} yield include token rewards?`,
+      answer: `No. Earnbase tracks on-chain APY only, derived from the vault's exchange rate changes over time. External incentives, token rewards, points programs, and liquidity mining bonuses are not included in the reported APY.`,
+    },
+  ];
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
@@ -24,10 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const T = product.ticker.toUpperCase();
   const hubCount = products.filter(p => (p.ticker || '').toUpperCase() === T).length;
+  const vaultFaq = buildVaultFaq(product, T);
   const seo = vaultProductSEO(
     product.product_name, product.platform_name, product.ticker,
     product.network, product.spotAPY, product.tvl, slug,
-    product.curator, hubCount
+    product.curator, hubCount, vaultFaq
   );
   const pageUrl = `${BASE_URL}/vault/${slug}`;
 
@@ -35,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: seo.title,
     description: seo.description,
     alternates: { canonical: pageUrl },
-    openGraph: { title: seo.title, description: seo.description, url: pageUrl },
+    openGraph: { title: seo.title, description: seo.description, url: pageUrl, images: [{ url: '/og-image.png', width: 1200, height: 630 }] },
     twitter: { title: seo.title, description: seo.description },
   };
 }
@@ -63,10 +81,11 @@ export default async function VaultPage({ params }: Props) {
   const hasCurator = product.curator && product.curator !== '-' && product.curator.trim() !== '';
   const hubCount = products.filter(p => (p.ticker || '').toUpperCase() === T).length;
 
+  const vaultFaq = buildVaultFaq(product, T);
   const seo = vaultProductSEO(
     product.product_name, product.platform_name, product.ticker,
     product.network, product.spotAPY, product.tvl, slug,
-    product.curator, hubCount
+    product.curator, hubCount, vaultFaq
   );
 
   // Find alternatives — same ticker, different product, sorted by APY
@@ -136,6 +155,17 @@ export default async function VaultPage({ params }: Props) {
               </a>
             </div>
           )}
+        </section>
+
+        {/* FAQ section */}
+        <section>
+          <h2 className="text-base font-semibold text-foreground mb-4">Frequently Asked Questions</h2>
+          {vaultFaq.map((item, i) => (
+            <div key={i} className="mb-4">
+              <h3 className="text-sm font-medium text-foreground">{item.question}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{item.answer}</p>
+            </div>
+          ))}
         </section>
 
         {/* Alternative strategies */}

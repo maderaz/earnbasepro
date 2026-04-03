@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { networkFilterSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
+import { resolveNetworkKey, computeNetworkSEOVars, buildNetworkFaq, getNetworkYieldExplainer } from '@/lib/networkSEOData';
 import { NetworkFilterClient } from './network-filter-client';
+import { NetworkSEOContent } from '../../components/NetworkSEOContent';
 
 export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
@@ -25,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = ticker.toLowerCase();
   const netSlug = network.toLowerCase();
   const netName = networkDisplayName(netSlug);
+  const networkKey = resolveNetworkKey(netSlug);
 
   let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
   try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
@@ -33,7 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     (p.ticker || '').toUpperCase() === T && matchNetwork(p.network, netSlug)
   );
   const sorted = [...filtered].sort((a, b) => b.spotAPY - a.spotAPY);
-  const seo = networkFilterSEO(t, netName, filtered.length, sorted);
+
+  // Build FAQ items for FAQPage schema
+  const vars = computeNetworkSEOVars(t, netSlug, networkKey, products);
+  const faqItems = buildNetworkFaq(T, netName, t, vars);
+
+  const seo = networkFilterSEO(t, netName, filtered.length, sorted, faqItems);
   const pageUrl = `${BASE_URL}/${t}/${netSlug}`;
 
   return {
@@ -51,6 +59,7 @@ export default async function NetworkPage({ params }: Props) {
   const T = t.toUpperCase();
   const netSlug = network.toLowerCase();
   const netName = networkDisplayName(netSlug);
+  const networkKey = resolveNetworkKey(netSlug);
 
   let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];
   try { ({ products } = await fetchPools()); } catch { /* network unavailable */ }
@@ -58,7 +67,13 @@ export default async function NetworkPage({ params }: Props) {
     (p.ticker || '').toUpperCase() === T && matchNetwork(p.network, netSlug)
   );
   const sorted = [...filtered].sort((a, b) => b.spotAPY - a.spotAPY);
-  const seo = networkFilterSEO(t, netName, filtered.length, sorted);
+
+  // Build FAQ + explainer content for SSR HTML + JSON-LD schema
+  const vars = computeNetworkSEOVars(t, netSlug, networkKey, products);
+  const faqItems = buildNetworkFaq(T, netName, t, vars);
+  const [yieldPara1, yieldPara2] = getNetworkYieldExplainer(T, networkKey, netName);
+
+  const seo = networkFilterSEO(t, netName, filtered.length, sorted, faqItems);
 
   return (
     <>
@@ -114,6 +129,44 @@ export default async function NetworkPage({ params }: Props) {
           </div>
         </section>
 
+        {/* Yield explainer paragraphs */}
+        <section>
+          <h2 className="text-lg font-semibold text-foreground mb-3">
+            How {T} Yields Work on {netName}
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-3">{yieldPara1}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{yieldPara2}</p>
+        </section>
+
+        {/* Best yield answer */}
+        {vars.count > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-2">
+              What is the best {T} yield on {netName} right now?
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              The highest on-chain {T} APY on {netName} currently tracked on Earnbase is {vars.topAPY}, offered by {vars.topProductName} on {vars.topPlatform}. This rate reflects the vault&apos;s native exchange rate and excludes external incentives.
+            </p>
+          </section>
+        )}
+
+        {/* SSR FAQ */}
+        {faqItems.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Common Questions about {T} Yields on {netName}
+            </h2>
+            <div className="space-y-4">
+              {faqItems.map((item, i) => (
+                <div key={i}>
+                  <h3 className="text-sm font-medium text-foreground">{item.question}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{item.answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section>
           <a href={`/${t}`} className="text-sm text-[#08a671] font-medium hover:underline">
             ← All {T} strategies
@@ -123,6 +176,14 @@ export default async function NetworkPage({ params }: Props) {
 
       {/* Interactive client */}
       <NetworkFilterClient
+        ticker={t}
+        network={netSlug}
+        networkName={netName}
+        products={JSON.parse(JSON.stringify(products))}
+      />
+
+      {/* SEO editorial content (client-side interactive accordion) */}
+      <NetworkSEOContent
         ticker={t}
         network={netSlug}
         networkName={netName}

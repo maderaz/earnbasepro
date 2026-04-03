@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { aboutPageSEO, BASE_URL } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
+export const revalidate = 3600; // re-render once per hour; about page counts don't need real-time freshness
 
 export async function generateMetadata(): Promise<Metadata> {
   let products: Awaited<ReturnType<typeof fetchPools>>['products'] = [];

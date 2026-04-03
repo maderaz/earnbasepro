@@ -342,14 +342,19 @@ export const CuratorPage: React.FC<CuratorPageProps> = ({ products, curatorSlug 
   );
 
   // ── Computed stats ───────────────────────────────────────
-  const { tickers, platforms, networks, tickerList, platformList } = useMemo(() => {
+  const { tickers, platforms, networks, tickerList, platformList, networkList, totalTVL, avgAPY } = useMemo(() => {
     const tSet = new Set<string>();
     const pSet = new Set<string>();
     const nSet = new Set<string>();
+    let tvlSum = 0;
+    let apySum = 0;
+    let apyCount = 0;
     curatorProducts.forEach(p => {
       tSet.add(p.ticker.toUpperCase());
       pSet.add(p.platform_name);
       nSet.add(p.network);
+      tvlSum += p.tvl || 0;
+      if ((p.spotAPY || 0) > 0) { apySum += p.spotAPY; apyCount++; }
     });
     const tickers = [...tSet].sort();
     const platforms = [...pSet].sort();
@@ -360,8 +365,17 @@ export const CuratorPage: React.FC<CuratorPageProps> = ({ products, curatorSlug 
       networks,
       tickerList: formatNaturalList(tickers),
       platformList: formatNaturalList(platforms),
+      networkList: formatNaturalList(networks),
+      totalTVL: tvlSum,
+      avgAPY: apyCount > 0 ? apySum / apyCount : 0,
     };
   }, [curatorProducts]);
+
+  // ── Top 30-day product ───────────────────────────────────
+  const topMonthlyProduct = useMemo(
+    () => [...curatorProducts].sort((a, b) => (b.monthlyAPY || 0) - (a.monthlyAPY || 0))[0] || null,
+    [curatorProducts]
+  );
 
   const strategyCount = curatorProducts.length;
 
@@ -396,6 +410,9 @@ export const CuratorPage: React.FC<CuratorPageProps> = ({ products, curatorSlug 
     const topTicker = topProduct?.ticker?.toUpperCase() || '';
     const topNetwork = topProduct?.network || '';
 
+    const topMonthlyAPY = topMonthlyProduct ? formatAPY(topMonthlyProduct.monthlyAPY) : '—';
+    const topMonthlyName = topMonthlyProduct?.product_name || '';
+
     return [
       {
         question: `What is the highest APY curated by ${curatorName}?`,
@@ -413,8 +430,34 @@ export const CuratorPage: React.FC<CuratorPageProps> = ({ products, curatorSlug 
         question: `Which platforms does ${curatorName} operate on?`,
         answer: `${curatorName} operates on ${platformList}. Different platforms offer different risk architectures and yield mechanics.`,
       },
+      {
+        question: `What is the total TVL managed by ${curatorName}?`,
+        answer: `The combined TVL across all ${strategyCount} strategies curated by ${curatorName} on Earnbase is ${formatTVL(totalTVL)}.`,
+      },
+      {
+        question: `What is the average APY across ${curatorName} strategies?`,
+        answer: `The average APY across all tracked ${curatorName} strategies is ${formatAPY(avgAPY)}. Individual strategies vary considerably depending on asset, platform, and risk parameters — sorting by APY reveals the full spread.`,
+      },
+      {
+        question: `How do ${curatorName} strategies compare across networks?`,
+        answer: `${curatorName} operates on ${networkList}. The same asset can yield materially different rates across networks because borrowing demand, liquidity depth, and protocol activity differ by chain. Comparing ${curatorName} strategies across networks is a reliable way to identify yield improvements without changing curator or risk profile.`,
+      },
+      {
+        question: `What is the best 30-day APY from ${curatorName}?`,
+        answer: topMonthlyProduct
+          ? `The highest 30-day average APY from ${curatorName} is ${topMonthlyAPY} on ${topMonthlyName}. The 30-day figure smooths out rate spikes and gives a clearer picture of what a strategy has actually delivered over time.`
+          : `30-day APY data is not yet available for ${curatorName} strategies.`,
+      },
+      {
+        question: `Does ${curatorName} include external incentives in APY?`,
+        answer: `No. APY shown on Earnbase reflects on-chain vault performance only. External incentives such as token rewards, points programs, and liquidity mining emissions are excluded from all figures.`,
+      },
+      {
+        question: `How does ${curatorName} manage risk?`,
+        answer: `${curatorName}'s approach to risk management is described in the About section above. In general, curator strategies differ by their choice of collateral types, allocation limits, utilization rate targets, and response protocols for market stress. Higher-yielding strategies from the same curator typically accept broader collateral exposure or higher utilization — the APY premium reflects these differences.`,
+      },
     ];
-  }, [curatorName, strategyCount, topProduct, tickers, platforms, networks, tickerList, platformList]);
+  }, [curatorName, strategyCount, topProduct, topMonthlyProduct, tickers, platforms, networks, tickerList, platformList, networkList, totalTVL, avgAPY]);
 
   // ── Server error state — backend is down ────────────────
   if (products.length === 0) {
@@ -456,7 +499,7 @@ export const CuratorPage: React.FC<CuratorPageProps> = ({ products, curatorSlug 
             </p>
           </div>
           <Link
-            to="/"
+            href="/"
             className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-xs font-semibold hover:bg-[#08a671]/90 transition-all"
           >
             Back to Home
@@ -480,6 +523,21 @@ export const CuratorPage: React.FC<CuratorPageProps> = ({ products, curatorSlug 
             Earnbase tracks {strategyCount} yield strategies curated by {curatorName} across {platforms.length} platform{platforms.length !== 1 ? 's' : ''} and {networks.length} network{networks.length !== 1 ? 's' : ''}. Compare APY rates for {tickerList} — updated daily.
           </p>
         </header>
+
+        {/* ── Stats Summary ───────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Total TVL', value: formatTVL(totalTVL) },
+            { label: 'Top APY', value: topProduct ? formatAPY(topProduct.spotAPY) : '—' },
+            { label: 'Platforms', value: String(platforms.length) },
+            { label: 'Networks', value: String(networks.length) },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-card rounded-xl border border-border px-4 py-3">
+              <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-[0.08em] mb-1">{label}</p>
+              <p className="text-[15px] font-semibold text-foreground tabular-nums">{value}</p>
+            </div>
+          ))}
+        </div>
 
         {/* ── Jump-to boxes (Asset Cards) ─────────────────── */}
         <section>

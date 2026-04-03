@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { fetchPools, fetchDisplaySettings } from '@/lib/api';
-import { homepageSEO, BASE_URL } from '@/lib/seo';
+import { homepageSEO, BASE_URL, formatTVLCompact } from '@/lib/seo';
 import { HomepageClient } from './homepage-client';
 
 // SSR at request time — APY data changes frequently
@@ -96,8 +96,8 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }}
       />
 
-      {/* SSR content visible to crawlers — hidden by HomepageClient once JS loads */}
-      <div id="homepage-seo-content" className="space-y-12">
+      {/* SSR content for crawlers — visually hidden from users, always present in DOM HTML for Google */}
+      <div id="homepage-seo-content" className="sr-only">
         {/* Hero */}
         <section>
           <h1 className="text-2xl font-semibold text-foreground">
@@ -189,7 +189,7 @@ export default async function HomePage() {
                 </tr>
               </thead>
               <tbody>
-                {homeProducts.slice(0, 50).map((p, i) => (
+                {homeProducts.map((p, i) => (
                   <tr key={p.id || i} className="border-b border-border/50 hover:bg-muted/30">
                     <td className="py-3 pr-4">
                       <a href={`/vault/${p.url || ''}`} className="text-foreground font-medium hover:text-[#08a671] transition-colors">
@@ -210,11 +210,6 @@ export default async function HomePage() {
               </tbody>
             </table>
           </div>
-          {homeProducts.length > 50 && (
-            <p className="text-xs text-muted-foreground mt-3">
-              Showing top 50 of {homeProducts.length} strategies.
-            </p>
-          )}
         </section>
       </div>
 
@@ -247,8 +242,3 @@ function getTopPerAsset(products: any[]) {
     .map(t => map.get(t)!);
 }
 
-function formatTVLCompact(tvl: number): string {
-  if (tvl >= 1_000_000) return `$${(tvl / 1_000_000).toFixed(1)}M`;
-  if (tvl >= 1_000) return `$${(tvl / 1_000).toFixed(1)}K`;
-  return `$${tvl.toFixed(0)}`;
-}

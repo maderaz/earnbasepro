@@ -178,7 +178,7 @@ export const AssetHubPage: React.FC<Props> = ({ ticker, products, allTickers }) 
               {net.icon ? (
                 <img src={net.icon} alt={net.name} className="w-4 h-4 object-contain" />
               ) : (
-                <span className="text-[11px] font-bold uppercase">All</span>
+                <span className="text-[11px] font-bold uppercase">{net.id === 'all' ? 'All' : net.name.slice(0, 3)}</span>
               )}
             </button>
           ))}

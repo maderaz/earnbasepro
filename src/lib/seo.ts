@@ -96,6 +96,11 @@ export function homepageSEO(tickers: string[], totalStrategies: number) {
       url: BASE_URL,
       description,
       publisher: EARNBASE_ORG,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
     },
     {
       '@type': 'WebPage',
@@ -103,6 +108,7 @@ export function homepageSEO(tickers: string[], totalStrategies: number) {
       url: BASE_URL,
       description,
       isPartOf: EARNBASE_WEBSITE,
+      dateModified: new Date().toISOString(),
     },
   ];
 
@@ -139,7 +145,7 @@ export function assetHubSEO(
   const description = `Earnbase tracks ${count}+ ${T} yield strategies across ${networkCount} network${networkCount === 1 ? '' : 's'}. Compare on-chain APY rates and TVL — updated daily.`;
 
   const graph: any[] = [
-    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), url: pageUrl, description, isPartOf: EARNBASE_WEBSITE },
+    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), url: pageUrl, description, isPartOf: EARNBASE_WEBSITE, dateModified: new Date().toISOString() },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
       { '@type': 'ListItem', position: 2, name: T },
@@ -178,7 +184,7 @@ export function networkFilterSEO(
   const description = `${count} ${T} strategies tracked on ${networkName}. Compare on-chain APY rates, TVL, and yield history side by side on Earnbase.`;
 
   const graph: any[] = [
-    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), url: pageUrl, description, isPartOf: EARNBASE_WEBSITE },
+    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), url: pageUrl, description, isPartOf: EARNBASE_WEBSITE, dateModified: new Date().toISOString() },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
       { '@type': 'ListItem', position: 2, name: T, item: `${BASE_URL}/${ticker.toLowerCase()}` },
@@ -238,7 +244,7 @@ export function vaultProductSEO(
   }
 
   const graph: any[] = [
-    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), url: pageUrl, description, isPartOf: EARNBASE_WEBSITE },
+    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), url: pageUrl, description, isPartOf: EARNBASE_WEBSITE, dateModified: new Date().toISOString() },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
       { '@type': 'ListItem', position: 2, name: T, item: `${BASE_URL}/${ticker.toLowerCase()}` },
@@ -246,7 +252,7 @@ export function vaultProductSEO(
       { '@type': 'ListItem', position: 4, name: `${productName} (${platform})` },
     ]},
     {
-      '@type': 'FinancialProduct', name: productName, url: pageUrl,
+      '@type': 'FinancialProduct', name: productName, url: pageUrl, dateModified: new Date().toISOString(),
       description: showAPY
         ? `${productName} on ${platform} generates ${apy} on-chain APY on ${T} (${network}). TVL: ${tvlStr}. Yield data tracked daily on Earnbase.`
         : `${productName} on ${platform}: ${T} yield strategy on ${network}. TVL: ${tvlStr}. Yield data tracked daily on Earnbase.`,
@@ -282,7 +288,7 @@ export function projectPageSEO(
   const description = `Compare ${strategyCount} ${projectName} yield strategies across ${tickerStr}. Live APY rates, TVL, sustainability scores, and performance history — updated daily.`;
 
   const graph: any[] = [
-    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), description, url: pageUrl, isPartOf: EARNBASE_WEBSITE },
+    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), description, url: pageUrl, isPartOf: EARNBASE_WEBSITE, dateModified: new Date().toISOString() },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Earnbase', item: BASE_URL },
       { '@type': 'ListItem', position: 2, name: `${projectName} Yields`, item: pageUrl },
@@ -323,7 +329,7 @@ export function curatorPageSEO(
   const description = `Compare ${strategyCount} yield strategies curated by ${curatorName} across ${tickerStr}. Live APY, TVL, and performance data — updated daily on Earnbase.`;
 
   const graph: any[] = [
-    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), description, url: pageUrl, isPartOf: EARNBASE_WEBSITE },
+    { '@type': 'WebPage', name: title.replace(' | Earnbase', ''), description, url: pageUrl, isPartOf: EARNBASE_WEBSITE, dateModified: new Date().toISOString() },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Earnbase', item: BASE_URL },
       { '@type': 'ListItem', position: 2, name: `${curatorName} Yields`, item: pageUrl },
@@ -357,7 +363,7 @@ export function aboutPageSEO(totalStrategies: number) {
   const pageUrl = `${BASE_URL}/about`;
 
   const graph: any[] = [
-    { '@type': 'WebPage', name: 'About Earnbase', url: pageUrl, description, isPartOf: EARNBASE_WEBSITE },
+    { '@type': 'WebPage', name: 'About Earnbase', url: pageUrl, description, isPartOf: EARNBASE_WEBSITE, dateModified: new Date().toISOString() },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
       { '@type': 'ListItem', position: 2, name: 'About' },

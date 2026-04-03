@@ -6,10 +6,10 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { SUPABASE_ANON_KEY, SUPABASE_API_URL } from '@/lib/supabase-config';
 
-const PROJECT_ID = 'bkjppldzhqhcsqrdqvsn';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJranBwbGR6aHFoY3NxcmRxdnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMzEwNzUsImV4cCI6MjA4NDgwNzA3NX0.D-WETIJOLhGhaBT3p5kYbfD_6vWmTpvatpA15lSSb4c';
-const BASE_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/make-server-7b092b69`;
+const ANON_KEY = SUPABASE_ANON_KEY;
+const BASE_URL = SUPABASE_API_URL;
 
 // Static network config — used for name resolution and matchesNetwork logic
 const NETWORK_CONFIG: { id: string; name: string; aliases: string[] }[] = [

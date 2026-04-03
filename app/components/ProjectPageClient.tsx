@@ -343,12 +343,17 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
   }, [projectProducts]);
 
   // ── Computed stats ───────────────────────────────────────
-  const { tickers, networks, tickerList, networkList } = useMemo(() => {
+  const { tickers, networks, tickerList, networkList, totalTVL, avgAPY } = useMemo(() => {
     const tSet = new Set<string>();
     const nSet = new Set<string>();
+    let tvlSum = 0;
+    let apySum = 0;
+    let apyCount = 0;
     projectProducts.forEach(p => {
       tSet.add(p.ticker.toUpperCase());
       nSet.add(p.network);
+      tvlSum += p.tvl || 0;
+      if ((p.spotAPY || 0) > 0) { apySum += p.spotAPY; apyCount++; }
     });
     const tickers = [...tSet].sort();
     const networks = [...nSet].sort();
@@ -357,8 +362,16 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
       networks,
       tickerList: tickers.join(', '),
       networkList: networks.join(', '),
+      totalTVL: tvlSum,
+      avgAPY: apyCount > 0 ? apySum / apyCount : 0,
     };
   }, [projectProducts]);
+
+  // ── Top 30-day product ───────────────────────────────────
+  const topMonthlyProduct = useMemo(
+    () => [...projectProducts].sort((a, b) => (b.monthlyAPY || 0) - (a.monthlyAPY || 0))[0] || null,
+    [projectProducts]
+  );
 
   const strategyCount = projectProducts.length;
 
@@ -393,6 +406,9 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
     const topTicker = topProduct?.ticker?.toUpperCase() || '';
     const topNetwork = topProduct?.network || '';
 
+    const topMonthlyAPY = topMonthlyProduct ? formatAPY(topMonthlyProduct.monthlyAPY) : '—';
+    const topMonthlyName = topMonthlyProduct?.product_name || '';
+
     return [
       {
         question: `What is the highest APY on ${projectName}?`,
@@ -400,7 +416,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
       },
       {
         question: `How many strategies does Earnbase track on ${projectName}?`,
-        answer: `Earnbase tracks ${strategyCount} yield strategies on ${projectName} across ${tickers.length} assets and ${networks.length} networks.`,
+        answer: `Earnbase tracks ${strategyCount} yield strategies on ${projectName} across ${tickers.length} asset${tickers.length !== 1 ? 's' : ''} and ${networks.length} network${networks.length !== 1 ? 's' : ''}.`,
       },
       {
         question: `What assets can I earn yield on with ${projectName}?`,
@@ -410,8 +426,34 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
         question: `Does ${projectName} yield include external rewards?`,
         answer: `No. APY shown on Earnbase reflects on-chain vault performance only. External incentives such as token rewards, points programs, and liquidity mining are excluded.`,
       },
+      {
+        question: `What is the total TVL across all ${projectName} strategies?`,
+        answer: `The combined TVL across all ${strategyCount} ${projectName} strategies tracked on Earnbase is ${formatTVL(totalTVL)}.`,
+      },
+      {
+        question: `What is the average APY across ${projectName} strategies?`,
+        answer: `The average APY across all tracked ${projectName} strategies is ${formatAPY(avgAPY)}. Individual strategies vary considerably — sorting the tables by APY reveals the full range from conservative to higher-yield positions.`,
+      },
+      {
+        question: `How do ${projectName} strategies compare across networks?`,
+        answer: `${projectName} is deployed on ${networkList}. Borrowing demand and liquidity conditions differ by network, so the same asset can yield different rates depending on which network you deposit on. Comparing across networks is one of the most reliable ways to find yield improvements without changing risk profile.`,
+      },
+      {
+        question: `What is the best 30-day APY on ${projectName}?`,
+        answer: topMonthlyProduct
+          ? `The highest 30-day average APY on ${projectName} is ${topMonthlyAPY} on ${topMonthlyName}. The 30-day figure smooths out short-term rate spikes and provides a more reliable indicator of what a position has actually delivered over time.`
+          : `30-day APY data is not yet available for ${projectName} strategies.`,
+      },
+      {
+        question: `How do I choose between ${projectName} strategies?`,
+        answer: `Sort by APY to identify the highest-yielding options, then examine the product name and network for context. Higher APY typically reflects higher collateral risk, leverage, or a smaller liquidity pool. Comparing the 24-hour APY against the 30-day average helps identify whether a rate spike is recent or sustained.`,
+      },
+      {
+        question: `Are all ${projectName} strategies the same risk?`,
+        answer: `No. ${projectName} strategies vary by collateral type, network, curator (if applicable), leverage, and liquidity pool size. A conservative USDC vault with blue-chip collateral carries different risk than a higher-yield strategy accepting more volatile collateral. APY differences between strategies on the same protocol reflect these underlying differences.`,
+      },
     ];
-  }, [projectName, strategyCount, topProduct, tickers, networks, tickerList]);
+  }, [projectName, strategyCount, topProduct, topMonthlyProduct, tickers, networks, tickerList, networkList, totalTVL, avgAPY]);
 
   // ── SEO ──────────────────────────────────────────────────
   // ── Loading state ────────────────────────────────────────
@@ -455,7 +497,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
             </p>
           </div>
           <Link
-            to="/"
+            href="/"
             className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-xs font-semibold hover:bg-[#08a671]/90 transition-all"
           >
             Back to Home
@@ -479,6 +521,21 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
             Earnbase tracks {strategyCount} yield strategies on {projectName} across {networks.length} network{networks.length !== 1 ? 's' : ''}. Compare APY rates for {tickerList}, updated daily.
           </p>
         </header>
+
+        {/* ── Stats Summary ───────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Total TVL', value: formatTVL(totalTVL) },
+            { label: 'Top APY', value: topProduct ? formatAPY(topProduct.spotAPY) : '—' },
+            { label: 'Networks', value: String(networks.length) },
+            { label: 'Assets', value: String(tickers.length) },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-card rounded-xl border border-border px-4 py-3">
+              <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-[0.08em] mb-1">{label}</p>
+              <p className="text-[15px] font-semibold text-foreground tabular-nums">{value}</p>
+            </div>
+          ))}
+        </div>
 
         {/* ── Jump-to boxes ───────────────────────────────── */}
         <section>
@@ -505,6 +562,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ products, slug }) => {
                   </div>
                   <span className="text-[12px] font-semibold text-foreground">{g.ticker}</span>
                   <span className="text-[10px] text-muted-foreground font-medium">{g.products.length}</span>
+                  <span className="text-[10px] text-[#08a671] font-medium tabular-nums">{formatAPY(g.topAPY)}</span>
                 </a>
               );
             })}

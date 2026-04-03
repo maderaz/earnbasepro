@@ -174,7 +174,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div>
                 <h4 className="text-[13px] font-medium text-white mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Curators</h4>
                 <ul className="space-y-2.5">
-                  {[{ label: 'Gauntlet', slug: 'gauntlet' }, { label: 'Steakhouse', slug: 'steakhouse' }, { label: 'Re7', slug: 're7' }, { label: 'Clearstar', slug: 'clearstar' }, { label: 'MEV Capital', slug: 'mev-capital' }, { label: 'Apostro', slug: 'apostro' }].map(c => (
+                  {[{ label: 'Gauntlet', slug: 'gauntlet' }, { label: 'Steakhouse', slug: 'steakhouse' }, { label: 'Re7', slug: 're7' }, { label: 'Clearstar', slug: 'clearstar' }, { label: 'MEV Capital', slug: 'mev-capital' }].map(c => (
                     <li key={c.slug}><Link href={`/curator/${c.slug}`} className="text-[13px] text-white/55 hover:text-white transition-colors">{c.label}</Link></li>
                   ))}
                 </ul>
@@ -197,9 +197,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </svg>
               </a>
               <div className="flex items-center gap-3 text-[11px] text-white/45">
-                <a href="https://files.earnbase.finance/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Sitemap</a>
+                <a href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</a>
                 <span className="text-white/20">&middot;</span>
-                <a href="https://files.earnbase.finance/llms.txt" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LLMs.txt</a>
+                <a href="/llms.txt" className="hover:text-white transition-colors">LLMs.txt</a>
                 <span className="text-white/20">&middot;</span>
                 <Link href="/about" className="hover:text-white transition-colors">About</Link>
                 <span className="text-white/20">&middot;</span>

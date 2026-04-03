@@ -1,0 +1,25 @@
+# AI model training crawlers — full access to public pages
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: PerplexityBot
+Allow: /
+Disallow: /control-room
+Disallow: /studio
+
+# AI real-time search & citation crawlers — full access
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /control-room
+Disallow: /studio
+
+# General web crawlers
+User-agent: *
+Allow: /
+Disallow: /control-room
+Disallow: /studio
+
+Sitemap: https://earnbase.finance/sitemap.xml

@@ -602,8 +602,60 @@ export function useVaultData(product: DeFiProduct | undefined, products: DeFiPro
       answer: `${product.platform_name} is the DeFi protocol infrastructure that ${product.product_name} operates on. It provides the smart contract layer for deposits, withdrawals, and strategy execution on the ${product.network} network.`,
     });
 
+    // ── Additional Yield & Performance ──────────────────────────
+
+    if (historyStats && !isPrivateCredit) {
+      items.push({
+        category: 'Yield & Performance',
+        question: `How volatile is the yield on ${product.product_name}?`,
+        answer: `${product.product_name} has a yield volatility rating of "${historyStats.volatility}" (standard deviation: ${historyStats.stdDev.toFixed(2)}pp over ${historyStats.dataPoints} days). The APY has ranged from ${historyStats.min.toFixed(2)}% to ${historyStats.max.toFixed(2)}% in the tracked period, with an average of ${historyStats.avg.toFixed(2)}%.`,
+      });
+    }
+
+    // ── Additional Liquidity & TVL ───────────────────────────────
+
+    if (marketStats && tvlStats) {
+      items.push({
+        category: 'Liquidity & TVL',
+        question: `How does ${product.product_name}'s TVL compare to other ${product.ticker} vaults?`,
+        answer: `${product.product_name} holds ${formatTVL(product.tvl)} in ${product.ticker} deposits. Across all ${marketStats.totalInAsset} tracked ${product.ticker} strategies, deposits range widely depending on the protocol and curator reputation. ${product.tvl > 0 ? `This vault's TVL of ${formatTVL(product.tvl)} places it within the broader spectrum of ${product.ticker} opportunities tracked on Earnbase.` : ''}`,
+      });
+    }
+
+    if (networkTvlRank) {
+      items.push({
+        category: 'Liquidity & TVL',
+        question: `How does ${product.product_name}'s TVL compare to other ${product.ticker} vaults on ${product.network}?`,
+        answer: `By total value locked, ${product.product_name} ranks #${networkTvlRank.networkTvlRank} of ${networkTvlRank.networkTvlTotal} ${product.ticker} strategies on ${product.network}. It currently holds ${formatTVL(product.tvl)}.`,
+      });
+    }
+
+    if (tvlStats) {
+      items.push({
+        category: 'Liquidity & TVL',
+        question: `Is ${product.product_name}'s TVL growing or declining?`,
+        answer: `${product.product_name}'s TVL is currently ${tvlStats.trendDirection === 'growing' ? 'on an upward trajectory' : tvlStats.trendDirection === 'declining' ? 'declining' : 'relatively stable'}. Over the past ${tvlStats.dataPoints} days, TVL moved from ${formatTVL(tvlStats.earlyAvg)} to ${formatTVL(tvlStats.recentAvg)}, a ${tvlStats.trendPct >= 0 ? '+' : ''}${tvlStats.trendPct.toFixed(1)}% change. The 30-day high was ${formatTVL(tvlStats.max)} and the 30-day low was ${formatTVL(tvlStats.min)}.`,
+      });
+    }
+
+    if (yieldTvlCorrelation && !isPrivateCredit) {
+      items.push({
+        category: 'Liquidity & TVL',
+        question: `What is the relationship between yield and TVL for ${product.product_name}?`,
+        answer: `${yieldTvlCorrelation.insight} In general, rising TVL in a lending vault can compress yields as more capital competes for the same borrow demand.`,
+      });
+    }
+
+    if (capitalFlows) {
+      items.push({
+        category: 'Liquidity & TVL',
+        question: `What are the recent capital flows for ${product.product_name}?`,
+        answer: `Over the past 30 days, ${product.product_name} had ${capitalFlows.inflowDays} days of inflows and ${capitalFlows.outflowDays} days of outflows. The largest single-day inflow was +${formatTVL(capitalFlows.largestInflow)} (${capitalFlows.largestInflowDate}) and the largest outflow was -${formatTVL(capitalFlows.largestOutflow)} (${capitalFlows.largestOutflowDate}). Net 30-day TVL change: ${capitalFlows.tvl30dChangePct >= 0 ? '+' : ''}${capitalFlows.tvl30dChangePct.toFixed(1)}%.`,
+      });
+    }
+
     return items;
-  }, [product, marketStats, sustainabilityMetrics, contextAnalysis, historyStats, yieldTrajectory, isPrivateCredit]);
+  }, [product, marketStats, sustainabilityMetrics, contextAnalysis, historyStats, tvlStats, yieldTrajectory, yieldTvlCorrelation, capitalFlows, networkTvlRank, isPrivateCredit]);
 
   const allChartData = useMemo((): ChartEntry[] => {
     if (!product) return [];
