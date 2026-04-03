@@ -13,6 +13,19 @@ function findProduct(products: DeFiProduct[], slug: string): DeFiProduct | undef
 }
 
 function buildVaultFaq(product: DeFiProduct, T: string): { question: string; answer: string }[] {
+  const hasCurator = product.curator && product.curator !== '-' && product.curator.trim() !== '';
+  const curator = hasCurator ? product.curator!.trim() : null;
+
+  const fourthQuestion = curator
+    ? {
+        question: `Who curates ${product.product_name}?`,
+        answer: `${product.product_name} is curated by ${curator}. Curators set the risk parameters, asset allocations, and rebalancing strategy for the vault. They are responsible for selecting which lending markets or protocols receive deposits. You can view all strategies curated by ${curator} on the ${curator} curator page on Earnbase.`,
+      }
+    : {
+        question: `Which network is ${product.product_name} deployed on?`,
+        answer: `${product.product_name} is deployed on ${product.network}. Network choice affects transaction costs, settlement speed, and which protocols are available. On-chain APY figures on Earnbase are calculated from exchange rate data on ${product.network} directly.`,
+      };
+
   return [
     {
       question: `What is the current APY for ${product.product_name}?`,
@@ -26,6 +39,7 @@ function buildVaultFaq(product: DeFiProduct, T: string): { question: string; ans
       question: `Does the ${product.product_name} yield include token rewards?`,
       answer: `No. Earnbase tracks on-chain APY only, derived from the vault's exchange rate changes over time. External incentives, token rewards, points programs, and liquidity mining bonuses are not included in the reported APY.`,
     },
+    fourthQuestion,
   ];
 }
 
@@ -38,6 +52,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) {
     return { title: 'Vault Not Found | Earnbase' };
   }
+
+  // noindex dead vaults: TVL nearly empty AND 30-day APY is zero (not just a temporary spot swing)
+  const isDeadVault = (product.tvl ?? 0) < 5000 && (product.monthlyAPY ?? 0) === 0;
 
   const T = product.ticker.toUpperCase();
   const hubCount = products.filter(p => (p.ticker || '').toUpperCase() === T).length;
@@ -55,6 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: pageUrl },
     openGraph: { title: seo.title, description: seo.description, url: pageUrl, images: [{ url: '/og-image.png', width: 1200, height: 630 }] },
     twitter: { title: seo.title, description: seo.description },
+    ...(isDeadVault && { robots: { index: false, follow: true } }),
   };
 }
 
@@ -77,6 +95,19 @@ export default async function VaultPage({ params }: Props) {
 
   const T = product.ticker.toUpperCase();
   const t = product.ticker.toLowerCase();
+
+  // Dead vault: TVL nearly empty AND 30-day APY is zero — serve minimal page, noindex set in generateMetadata
+  if ((product.tvl ?? 0) < 5000 && (product.monthlyAPY ?? 0) === 0) {
+    return (
+      <div className="py-24 text-center">
+        <p className="text-muted-foreground text-sm">This vault is no longer active.</p>
+        <a href={`/${t}`} className="inline-block mt-4 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-sm font-semibold">
+          See all {T} strategies →
+        </a>
+      </div>
+    );
+  }
+
   const netSlug = product.network.toLowerCase().replace(/\s+/g, '-');
   const hasCurator = product.curator && product.curator !== '-' && product.curator.trim() !== '';
   const hubCount = products.filter(p => (p.ticker || '').toUpperCase() === T).length;
@@ -93,6 +124,17 @@ export default async function VaultPage({ params }: Props) {
     .filter(p => (p.ticker || '').toUpperCase() === T && getProductSlug(p) !== slug)
     .sort((a, b) => b.spotAPY - a.spotAPY)
     .slice(0, 10);
+
+  // Cross-asset platform links — same platform, different asset, for internal PageRank flow
+  const platformCross = products
+    .filter(p =>
+      p.platform_name === product.platform_name &&
+      (p.ticker || '').toUpperCase() !== T &&
+      getProductSlug(p) !== slug &&
+      (p.spotAPY ?? 0) > 0
+    )
+    .sort((a, b) => b.spotAPY - a.spotAPY)
+    .slice(0, 6);
 
   const isPrivateCredit = (privateCreditIds || []).some(id => String(id) === String(product.id)) ||
     product.platform_name.toLowerCase() === 'wildcat';
@@ -201,6 +243,28 @@ export default async function VaultPage({ params }: Props) {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </section>
+        )}
+
+        {/* Cross-asset platform links — distributes PageRank across asset hubs */}
+        {platformCross.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              More {product.platform_name} Strategies
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {platformCross.map((p, i) => (
+                <a key={p.id || i} href={`/vault/${getProductSlug(p)}`}
+                  className="block p-3 rounded-lg border border-border bg-card hover:shadow-sm transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#08a671]">{p.ticker.toUpperCase()}</span>
+                    <span className="text-xs text-muted-foreground">{p.network}</span>
+                  </div>
+                  <p className="text-sm font-medium text-foreground mt-1 truncate">{p.product_name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{p.spotAPY.toFixed(2)}% APY · {formatTVLCompact(p.tvl)}</p>
+                </a>
+              ))}
             </div>
           </section>
         )}
