@@ -6,7 +6,7 @@
 
 export const BASE_URL = 'https://earnbase.finance';
 const LOGO_URL = `${BASE_URL}/logo.png`;
-const OG_IMAGE_URL = `${BASE_URL}/og-image.png`;
+const OG_IMAGE_URL = `${BASE_URL}/FEATURED%20IMG.png`;
 
 const TITLE_LIMIT = 60;
 

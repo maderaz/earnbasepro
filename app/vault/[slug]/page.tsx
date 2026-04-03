@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: seo.title,
     description: seo.description,
     alternates: { canonical: pageUrl },
-    openGraph: { title: seo.title, description: seo.description, url: pageUrl, images: [{ url: '/og-image.png', width: 1200, height: 630 }] },
+    openGraph: { title: seo.title, description: seo.description, url: pageUrl, images: [{ url: '/FEATURED%20IMG.png', width: 1200, height: 630 }] },
     twitter: { title: seo.title, description: seo.description },
     ...(isDeadVault && { robots: { index: false, follow: true } }),
   };
