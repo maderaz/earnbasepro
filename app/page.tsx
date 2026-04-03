@@ -50,7 +50,8 @@ export default async function HomePage() {
       tickerCounts[t] = (tickerCounts[t] || 0) + 1;
     }
   }
-  const tickers = Object.keys(tickerCounts).sort((a, b) => {
+  const HIDDEN_TICKERS = new Set(['RLUSD']);
+  const tickers = Object.keys(tickerCounts).filter(t => !HIDDEN_TICKERS.has(t)).sort((a, b) => {
     const diff = tickerCounts[b] - tickerCounts[a];
     return diff !== 0 ? diff : a.localeCompare(b);
   });
