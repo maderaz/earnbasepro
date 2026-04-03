@@ -111,6 +111,17 @@ export default async function VaultPage({ params }: Props) {
     .sort((a, b) => b.spotAPY - a.spotAPY)
     .slice(0, 10);
 
+  // Cross-asset platform links — same platform, different asset, for internal PageRank flow
+  const platformCross = products
+    .filter(p =>
+      p.platform_name === product.platform_name &&
+      (p.ticker || '').toUpperCase() !== T &&
+      getProductSlug(p) !== slug &&
+      (p.spotAPY ?? 0) > 0
+    )
+    .sort((a, b) => b.spotAPY - a.spotAPY)
+    .slice(0, 6);
+
   const isPrivateCredit = (privateCreditIds || []).some(id => String(id) === String(product.id)) ||
     product.platform_name.toLowerCase() === 'wildcat';
 
@@ -218,6 +229,28 @@ export default async function VaultPage({ params }: Props) {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </section>
+        )}
+
+        {/* Cross-asset platform links — distributes PageRank across asset hubs */}
+        {platformCross.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              More {product.platform_name} Strategies
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {platformCross.map((p, i) => (
+                <a key={p.id || i} href={`/vault/${getProductSlug(p)}`}
+                  className="block p-3 rounded-lg border border-border bg-card hover:shadow-sm transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#08a671]">{p.ticker.toUpperCase()}</span>
+                    <span className="text-xs text-muted-foreground">{p.network}</span>
+                  </div>
+                  <p className="text-sm font-medium text-foreground mt-1 truncate">{p.product_name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{p.spotAPY.toFixed(2)}% APY · {formatTVLCompact(p.tvl)}</p>
+                </a>
+              ))}
             </div>
           </section>
         )}
