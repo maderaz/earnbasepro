@@ -340,10 +340,7 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
                   return (
                     <tr
                       key={product.id}
-                      onClick={() => router.push(vaultUrl)}
-                      className="hover:bg-muted/30 transition-colors group cursor-pointer"
-                      role="link"
-                      aria-label={`View ${product.product_name} on ${product.platform_name}`}
+                      className="hover:bg-muted/30 transition-colors group cursor-pointer relative"
                     >
                       <td className="hidden lg:table-cell pl-4 py-3 align-middle text-[11px] font-normal text-muted-foreground/60 w-[40px]">
                         {index + 1}
@@ -374,9 +371,7 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
                       <td className="px-2 lg:px-3 py-3 align-middle">
                         <Link
                           href={vaultUrl}
-                          className="flex flex-col max-w-[120px] lg:max-w-none overflow-hidden"
-                          onClick={e => e.stopPropagation()}
-                          tabIndex={-1}
+                          className="flex flex-col max-w-[120px] lg:max-w-none overflow-hidden after:absolute after:inset-0 after:content-['']"
                         >
                           <span className="text-[13px] font-semibold text-foreground leading-tight truncate">
                             {product.product_name}
