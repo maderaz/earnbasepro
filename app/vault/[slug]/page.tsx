@@ -39,6 +39,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Vault Not Found | Earnbase' };
   }
 
+  // noindex dead vaults: TVL nearly empty AND 30-day APY is zero (not just a temporary spot swing)
+  const isDeadVault = (product.tvl ?? 0) < 5000 && (product.monthlyAPY ?? 0) === 0;
+
   const T = product.ticker.toUpperCase();
   const hubCount = products.filter(p => (p.ticker || '').toUpperCase() === T).length;
   const vaultFaq = buildVaultFaq(product, T);
@@ -55,6 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: pageUrl },
     openGraph: { title: seo.title, description: seo.description, url: pageUrl, images: [{ url: '/og-image.png', width: 1200, height: 630 }] },
     twitter: { title: seo.title, description: seo.description },
+    ...(isDeadVault && { robots: { index: false, follow: true } }),
   };
 }
 
@@ -77,6 +81,19 @@ export default async function VaultPage({ params }: Props) {
 
   const T = product.ticker.toUpperCase();
   const t = product.ticker.toLowerCase();
+
+  // Dead vault: TVL nearly empty AND 30-day APY is zero — serve minimal page, noindex set in generateMetadata
+  if ((product.tvl ?? 0) < 5000 && (product.monthlyAPY ?? 0) === 0) {
+    return (
+      <div className="py-24 text-center">
+        <p className="text-muted-foreground text-sm">This vault is no longer active.</p>
+        <a href={`/${t}`} className="inline-block mt-4 px-5 py-2.5 bg-[#08a671] text-white rounded-xl text-sm font-semibold">
+          See all {T} strategies →
+        </a>
+      </div>
+    );
+  }
+
   const netSlug = product.network.toLowerCase().replace(/\s+/g, '-');
   const hasCurator = product.curator && product.curator !== '-' && product.curator.trim() !== '';
   const hubCount = products.filter(p => (p.ticker || '').toUpperCase() === T).length;
