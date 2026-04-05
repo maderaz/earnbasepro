@@ -411,15 +411,12 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
 
       {/* Show more / pagination */}
       {hasMore && (
-        <div className="flex items-center justify-center gap-4 py-5 border-t border-border/50">
-          <span className="text-[12px] text-muted-foreground">
-            Showing {displayCount} of {filteredProducts.length} strategies
-          </span>
+        <div className="flex items-center justify-center py-5 border-t border-border/50">
           <button
             onClick={() => setDisplayCount(c => c + 100)}
             className="px-5 py-2 text-[12px] font-semibold text-[#08a671] border border-[#08a671]/30 rounded-lg hover:bg-[#08a671]/5 transition-colors"
           >
-            Show 100 more
+            Show more
           </button>
         </div>
       )}

@@ -15,9 +15,10 @@ const PROTOCOL_LOGOS = ['Euler', 'Aave', 'Fusion', 'Yearn', 'Lagoon'] as const;
 
 interface Props {
   products: DeFiProduct[];
+  totalCount?: number;
 }
 
-export const HeroSection: React.FC<Props> = ({ products }) => {
+export const HeroSection: React.FC<Props> = ({ products, totalCount }) => {
   const router = useRouter();
 
   return (
@@ -45,7 +46,7 @@ export const HeroSection: React.FC<Props> = ({ products }) => {
           className="mt-5 sm:mt-6 text-[15px] sm:text-[17px] text-white/65 leading-[1.6] max-w-[440px] font-medium tracking-[-0.01em]"
           style={{ fontFamily: FONT }}
         >
-          Compare {products.length || '300+'} yield strategies across USDC, ETH, USDT, and more. Updated every day.
+          Compare {totalCount || products.length || '300+'} yield strategies across USDC, ETH, USDT, and more. Updated every day.
         </p>
 
         <div className="mt-9 sm:mt-10">
