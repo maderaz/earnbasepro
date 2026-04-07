@@ -6,7 +6,7 @@ import {
   Upload, Image as ImageIcon, CheckCircle2, AlertCircle, Search,
   Settings, ChevronRight, Sparkles, RefreshCw,
   BookOpen, MousePointerClick, Eye, EyeOff, Landmark, Link2,
-  TrendingUp, LayoutDashboard
+  TrendingUp, LayoutDashboard, BarChart2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import * as api from '@/app/utils/api';
@@ -20,6 +20,7 @@ import { TrafficPanel } from './TrafficPanel';
 import { HiddenProductsPanel } from './HiddenProductsPanel';
 import { PrivateCreditPanel } from './PrivateCreditPanel';
 import { AnalyticsPanel } from './AnalyticsPanel';
+import { SerpViewPanel } from './SerpViewPanel';
 import { DashboardPanel } from './DashboardPanel';
 import { IconsPanel } from './IconsPanel';
 
@@ -745,6 +746,17 @@ export const ControlRoom: React.FC = () => {
             <Landmark className="w-3.5 h-3.5" />
             Private Credit
           </button>
+          <button
+            onClick={() => setSectionTab('serp')}
+            className={`flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              sectionTab === 'serp'
+                ? 'bg-card text-foreground shadow-sm border border-border'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            SERP View
+          </button>
         </div>
       </div>
 
@@ -774,6 +786,9 @@ export const ControlRoom: React.FC = () => {
 
       {/* ═══ Icons Section ═══ */}
       {sectionTab === 'icons' && <IconsPanel />}
+
+      {/* ═══ SERP View Section ═══ */}
+      {sectionTab === 'serp' && <SerpViewPanel />}
 
       {/* ═══ Rules Section ═══ */}
       {sectionTab === 'rules' && <ControlRoomRules />}
