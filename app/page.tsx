@@ -220,6 +220,7 @@ export default async function HomePage() {
         tickers={tickers}
         tickerCounts={tickerCounts}
         displaySettings={displaySettings}
+        totalProductCount={products.length}
       />
     </>
   );

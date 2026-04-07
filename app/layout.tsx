@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Layout } from './components/Layout';
+import { PageViewTracker } from './components/PageViewTracker';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({
         <link rel="llms-full-txt" href="/llms-full.txt" />
       </head>
       <body className="bg-background text-foreground antialiased">
+        <PageViewTracker />
         <Layout>{children}</Layout>
       </body>
     </html>

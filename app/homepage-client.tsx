@@ -17,13 +17,14 @@ interface Props {
   tickers: string[];
   tickerCounts: Record<string, number>;
   displaySettings: DisplaySettings;
+  totalProductCount: number;
 }
 
-export function HomepageClient({ initialProducts, tickers }: Props) {
+export function HomepageClient({ initialProducts, tickers, totalProductCount }: Props) {
   return (
     <RegistryProvider>
       <div className="space-y-10 lg:space-y-14">
-        <HeroSection products={initialProducts} />
+        <HeroSection products={initialProducts} totalCount={totalProductCount} />
         <TrackerTable products={initialProducts} allTickers={tickers} />
         <HomepageContent products={initialProducts} />
       </div>
