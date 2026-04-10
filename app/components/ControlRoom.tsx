@@ -91,7 +91,7 @@ const PlatformStrategiesTable: React.FC = () => {
   );
 };
 
-type SectionTab = 'dashboard' | 'registry' | 'icons' | 'rules' | 'clicks' | 'searches' | 'clients' | 'traffic' | 'hidden' | 'private-credit' | 'analytics';
+type SectionTab = 'dashboard' | 'registry' | 'icons' | 'rules' | 'clicks' | 'searches' | 'clients' | 'traffic' | 'hidden' | 'private-credit' | 'analytics' | 'serp';
 
 // ─── Types ───────────────────────────────────────────────────
 interface TabConfig {

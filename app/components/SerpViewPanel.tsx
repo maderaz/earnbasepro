@@ -20,6 +20,8 @@ function formatTVL(tvl: number): string {
   return `$${tvl.toFixed(0)}`;
 }
 
+const TITLE_LIMIT = 60;
+
 function buildVaultSEO(p: DeFiProduct) {
   const T = p.ticker.toUpperCase();
   const threshold = APY_THRESHOLDS[T] ?? 0.50;
@@ -28,9 +30,22 @@ function buildVaultSEO(p: DeFiProduct) {
   const tvl = formatTVL(p.tvl);
   const slug = getProductSlug(p);
 
-  const title = showAPY
-    ? `${p.product_name} — ${apy}% APY | Earnbase`
-    : `${p.product_name} | Earnbase`;
+  // Mirror buildVaultTitle from seo.ts — same separator (' - ') and 60-char limit
+  const fullName = p.product_name;
+  const shortName = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
+  let title: string;
+  if (showAPY) {
+    const candidates = [
+      `${fullName} - ${apy}% APY | Earnbase`,
+      `${shortName} - ${apy}% APY | Earnbase`,
+      `${fullName} - ${apy}% APY`,
+      `${shortName} - ${apy}% APY`,
+    ];
+    title = candidates.find(t => t.length <= TITLE_LIMIT) ?? candidates[candidates.length - 1];
+  } else {
+    const candidates = [`${fullName} | Earnbase`, `${shortName} | Earnbase`];
+    title = candidates.find(t => t.length <= TITLE_LIMIT) ?? candidates[candidates.length - 1];
+  }
 
   const description = showAPY
     ? `${p.product_name} on ${p.platform_name} generates ${apy}% on-chain APY on ${T} (${p.network}). TVL: ${tvl}. Yield data tracked daily on Earnbase.`
