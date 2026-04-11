@@ -101,9 +101,9 @@ export default async function HomePage() {
       <div id="homepage-seo-content" className="sr-only">
         {/* Hero */}
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Compare DeFi Yields Across Protocols
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             Track and compare {products.length}+ yield strategies across {networks.size} networks
             and {new Set(products.map(p => (p.platform_name || '').trim())).size}+ protocols.

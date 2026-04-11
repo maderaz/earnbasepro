@@ -75,9 +75,9 @@ export default async function AssetHubPage({ params }: Props) {
       {/* SSR skeleton */}
       <div id="asset-hub-seo-content" className="space-y-10">
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yield Strategies
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             Track and compare {T} yield opportunities across {networks.size} networks
             and {new Set(filtered.map(p => p.platform_name)).size}+ protocols. On-chain APY data — updated daily.

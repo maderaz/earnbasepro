@@ -160,7 +160,7 @@ export default async function VaultPage({ params }: Props) {
         <section className="p-6 rounded-xl border border-border bg-card space-y-4">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-semibold text-foreground">{product.product_name}</h1>
+              <h2 className="text-xl font-semibold text-foreground">{product.product_name}</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {product.platform_name}{hasCurator ? ` · Curated by ${product.curator!.trim()}` : ''} · {product.network}
               </p>

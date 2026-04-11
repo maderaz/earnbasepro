@@ -88,9 +88,9 @@ export default async function CuratorPage({ params }: Props) {
         </nav>
 
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Strategies Curated by {curatorName}
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             Compare {filtered.length} yield strategies curated by {curatorName} across {tickers.join(', ')}.
             Live APY, TVL, and performance data — updated daily.

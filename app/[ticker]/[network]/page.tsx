@@ -90,9 +90,9 @@ export default async function NetworkPage({ params }: Props) {
         </nav>
 
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yields on {netName}
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             {filtered.length} {T} strategies tracked on {netName}. Compare on-chain APY rates, TVL, and yield history side by side.
           </p>
