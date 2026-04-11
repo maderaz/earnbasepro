@@ -511,10 +511,13 @@ export function SerpViewPanel() {
         </div>
       ) : (
         // ── PREVIEW ──
-        <div className="flex gap-6 flex-1 min-h-0">
+        // On mobile: block container (one panel at a time). On sm+: flex row (two columns).
+        <div className="flex-1 min-h-0 overflow-hidden sm:flex sm:gap-6">
 
-          {/* Left: product list — hidden on mobile when detail is focused */}
-          <div className={`w-full sm:w-72 sm:shrink-0 flex-col gap-2 min-h-0 ${mobileFocus === 'detail' ? 'hidden sm:flex' : 'flex'}`}>
+          {/* Left: product list */}
+          <div className={`flex-col gap-2 h-full sm:h-auto sm:w-72 sm:shrink-0 sm:min-h-0 ${
+            mobileFocus === 'detail' ? 'hidden sm:flex' : 'flex'
+          }`}>
             <button
               onClick={() => handleSort('score')}
               className={`text-[11px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-colors shrink-0 ${
@@ -548,8 +551,10 @@ export function SerpViewPanel() {
             </div>
           </div>
 
-          {/* Right: SERP previews — hidden on mobile when list is focused */}
-          <div className={`flex-1 overflow-y-auto space-y-6 ${mobileFocus === 'list' ? 'hidden sm:block' : 'block'}`}>
+          {/* Right: SERP previews */}
+          <div className={`h-full overflow-y-auto space-y-6 sm:h-auto sm:flex-1 ${
+            mobileFocus === 'list' ? 'hidden sm:block' : 'block'
+          }`}>
             {/* Mobile back button */}
             <button
               onClick={() => setMobileFocus('list')}
