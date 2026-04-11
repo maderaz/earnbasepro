@@ -191,7 +191,7 @@ function SeoHealthCard({ result }: { result: SeoScore }) {
   return (
     <div className="p-4 bg-muted/30 rounded-xl border border-border">
       <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider mb-3">SEO Health</p>
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-4 sm:gap-6">
         <div className="shrink-0 flex flex-col items-center justify-center w-20">
           <span className={`text-4xl font-bold tabular-nums ${scoreColor}`}>{score}</span>
           <span className={`text-[11px] font-semibold mt-0.5 ${scoreColor}`}>{label}</span>
@@ -324,30 +324,32 @@ function DesktopResult({ title, description, breadcrumb, faq }: {
   const descDisplay  = description.length > 160 ? description.slice(0, 157) + '...' : description;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 max-w-[600px] font-sans">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-          <span className="text-white text-[9px] font-bold">E</span>
+    <div className="overflow-x-auto">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 w-full max-w-[600px] min-w-[280px] font-sans">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+            <span className="text-white text-[9px] font-bold">E</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[13px] text-gray-800 leading-none">Earnbase</p>
+            <p className="text-[12px] text-gray-500 leading-none mt-0.5 truncate">{breadcrumb}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-[13px] text-gray-800 leading-none">Earnbase</p>
-          <p className="text-[12px] text-gray-500 leading-none mt-0.5 truncate max-w-[480px]">{breadcrumb}</p>
+        <h3 className="text-[18px] sm:text-[20px] text-[#1a0dab] font-normal leading-snug hover:underline cursor-pointer mt-1">
+          {titleDisplay}
+        </h3>
+        <p className="text-[13px] sm:text-[14px] text-gray-600 leading-snug mt-1">{descDisplay}</p>
+        <div className="mt-3 space-y-1.5 border-t border-gray-100 pt-3">
+          {faq.slice(0, 2).map((item, i) => (
+            <details key={i} className="group">
+              <summary className="text-[13px] sm:text-[14px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between gap-2">
+                <span>{item.q}</span>
+                <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform shrink-0">▾</span>
+              </summary>
+              <p className="text-[12px] sm:text-[13px] text-gray-600 mt-1 pl-2">{item.a}</p>
+            </details>
+          ))}
         </div>
-      </div>
-      <h3 className="text-[20px] text-[#1a0dab] font-normal leading-snug hover:underline cursor-pointer mt-1">
-        {titleDisplay}
-      </h3>
-      <p className="text-[14px] text-gray-600 leading-snug mt-1">{descDisplay}</p>
-      <div className="mt-3 space-y-1.5 border-t border-gray-100 pt-3">
-        {faq.slice(0, 2).map((item, i) => (
-          <details key={i} className="group">
-            <summary className="text-[14px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between">
-              {item.q}
-              <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform">▾</span>
-            </summary>
-            <p className="text-[13px] text-gray-600 mt-1 pl-2">{item.a}</p>
-          </details>
-        ))}
       </div>
     </div>
   );
@@ -362,14 +364,14 @@ function MobileResult({ title, description, breadcrumb, faq }: {
   const descDisplay  = description.length > 130 ? description.slice(0, 127) + '...' : description;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 w-[360px] font-sans">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 w-full max-w-[360px] font-sans">
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+        <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center shrink-0">
           <span className="text-white text-[8px] font-bold">E</span>
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-[12px] text-gray-800 leading-none">Earnbase</p>
-          <p className="text-[11px] text-gray-500 leading-none mt-0.5 truncate max-w-[300px]">{breadcrumb}</p>
+          <p className="text-[11px] text-gray-500 leading-none mt-0.5 truncate">{breadcrumb}</p>
         </div>
       </div>
       <h3 className="text-[18px] text-[#1a0dab] font-normal leading-snug mt-1">
@@ -379,9 +381,9 @@ function MobileResult({ title, description, breadcrumb, faq }: {
       <div className="mt-3 space-y-1.5 border-t border-gray-100 pt-3">
         {faq.slice(0, 2).map((item, i) => (
           <details key={i} className="group">
-            <summary className="text-[13px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between">
-              {item.q.length > 55 ? item.q.slice(0, 52) + '...' : item.q}
-              <span className="text-gray-400 text-xs">▾</span>
+            <summary className="text-[13px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between gap-2">
+              <span>{item.q.length > 55 ? item.q.slice(0, 52) + '...' : item.q}</span>
+              <span className="text-gray-400 text-xs shrink-0">▾</span>
             </summary>
             <p className="text-[12px] text-gray-600 mt-1 pl-2">{item.a}</p>
           </details>
@@ -624,15 +626,15 @@ export function SerpViewPanel() {
                   <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider">Raw Values</p>
                   <div>
                     <p className="text-[11px] text-muted-foreground mb-0.5">Title tag</p>
-                    <p className="text-[13px] text-foreground font-mono bg-background px-2 py-1 rounded">{seo.title}</p>
+                    <p className="text-[12px] text-foreground font-mono bg-background px-2 py-1 rounded break-all">{seo.title}</p>
                   </div>
                   <div>
                     <p className="text-[11px] text-muted-foreground mb-0.5">Meta description</p>
-                    <p className="text-[13px] text-foreground font-mono bg-background px-2 py-1 rounded">{seo.description}</p>
+                    <p className="text-[12px] text-foreground font-mono bg-background px-2 py-1 rounded break-all">{seo.description}</p>
                   </div>
                   <div>
                     <p className="text-[11px] text-muted-foreground mb-0.5">Canonical URL</p>
-                    <p className="text-[13px] text-[#08a671] font-mono bg-background px-2 py-1 rounded">https://{seo.url}</p>
+                    <p className="text-[12px] text-[#08a671] font-mono bg-background px-2 py-1 rounded break-all">https://{seo.url}</p>
                   </div>
                 </div>
               </>
