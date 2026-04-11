@@ -88,9 +88,9 @@ export default async function ProjectPage({ params }: Props) {
         </nav>
 
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             {projectName} Yield Strategies
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             Compare {filtered.length} yield strategies on {projectName} across {tickers.join(', ')}.
             Live APY rates, TVL, and performance history — updated daily.

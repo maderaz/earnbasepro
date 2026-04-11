@@ -68,6 +68,11 @@ export default async function AssetHubPage({ params }: Props) {
   products.forEach(p => tickerCounts.set(p.ticker.toUpperCase(), (tickerCounts.get(p.ticker.toUpperCase()) || 0) + 1));
   const allTickers = [...tickerCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
 
+  // Strip history arrays from products before passing as page props — these arrays
+  // (dailyApyHistory, tvlHistory) can be hundreds of KB and are not used by any
+  // component on this page. They are only needed on individual vault pages.
+  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
@@ -75,9 +80,9 @@ export default async function AssetHubPage({ params }: Props) {
       {/* SSR skeleton */}
       <div id="asset-hub-seo-content" className="space-y-10">
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yield Strategies
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             Track and compare {T} yield opportunities across {networks.size} networks
             and {new Set(filtered.map(p => p.platform_name)).size}+ protocols. On-chain APY data — updated daily.
@@ -97,9 +102,9 @@ export default async function AssetHubPage({ params }: Props) {
           </div>
         </section>
 
-        {/* Product table */}
+        {/* Product table — top 20 for crawlers; full table loaded by client */}
         <section>
-          <h2 className="text-lg font-semibold text-foreground mb-4">All {T} Strategies</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Top {T} Strategies by APY</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -112,7 +117,7 @@ export default async function AssetHubPage({ params }: Props) {
                 </tr>
               </thead>
               <tbody>
-                {sorted.map((p, i) => (
+                {sorted.slice(0, 20).map((p, i) => (
                   <tr key={p.id || i} className="border-b border-border/50">
                     <td className="py-3 pr-4">
                       <a href={`/vault/${getProductSlug(p)}`} className="text-foreground font-medium hover:text-[#08a671]">
@@ -128,6 +133,11 @@ export default async function AssetHubPage({ params }: Props) {
               </tbody>
             </table>
           </div>
+          {sorted.length > 20 && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Showing top 20 of {sorted.length} {T} strategies. All strategies are listed in the table above.
+            </p>
+          )}
         </section>
 
         {/* Cross-links */}
@@ -163,12 +173,12 @@ export default async function AssetHubPage({ params }: Props) {
       {/* Interactive client */}
       <AssetHubClient
         ticker={t}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(leanProducts))}
         allTickers={allTickers}
       />
 
       {/* SEO editorial content (client-side interactive accordion + about sections) */}
-      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(products))} />
+      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(leanProducts))} />
     </>
   );
 }

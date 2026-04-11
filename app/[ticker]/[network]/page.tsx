@@ -75,6 +75,9 @@ export default async function NetworkPage({ params }: Props) {
 
   const seo = networkFilterSEO(t, netName, filtered.length, sorted, faqItems);
 
+  // Strip history arrays — not used on this page, can be hundreds of KB
+  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
@@ -90,9 +93,9 @@ export default async function NetworkPage({ params }: Props) {
         </nav>
 
         <section>
-          <h1 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yields on {netName}
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             {filtered.length} {T} strategies tracked on {netName}. Compare on-chain APY rates, TVL, and yield history side by side.
           </p>
@@ -111,7 +114,7 @@ export default async function NetworkPage({ params }: Props) {
                 </tr>
               </thead>
               <tbody>
-                {sorted.map((p, i) => (
+                {sorted.slice(0, 20).map((p, i) => (
                   <tr key={p.id || i} className="border-b border-border/50">
                     <td className="py-3 pr-4">
                       <a href={`/vault/${getProductSlug(p)}`} className="text-foreground font-medium hover:text-[#08a671]">
@@ -127,6 +130,11 @@ export default async function NetworkPage({ params }: Props) {
               </tbody>
             </table>
           </div>
+          {sorted.length > 20 && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Showing top 20 of {sorted.length} {T} strategies on {netName}.
+            </p>
+          )}
         </section>
 
         {/* Yield explainer paragraphs */}
@@ -179,7 +187,7 @@ export default async function NetworkPage({ params }: Props) {
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(leanProducts))}
       />
 
       {/* SEO editorial content (client-side interactive accordion) */}
@@ -187,7 +195,7 @@ export default async function NetworkPage({ params }: Props) {
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(leanProducts))}
       />
     </>
   );
