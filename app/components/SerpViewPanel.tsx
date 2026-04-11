@@ -43,13 +43,25 @@ function buildVaultSEO(p: DeFiProduct) {
     ];
     title = candidates.find(t => t.length <= TITLE_LIMIT) ?? candidates[candidates.length - 1];
   } else {
-    const candidates = [`${fullName} | Earnbase`, `${shortName} | Earnbase`];
+    const candidates = [
+      `${fullName} on ${p.platform_name} (${p.network}) | Earnbase`,
+      `${fullName} on ${p.platform_name} | Earnbase`,
+      `${shortName} on ${p.platform_name} | Earnbase`,
+      `${fullName} | Earnbase`,
+      `${shortName} | Earnbase`,
+    ];
     title = candidates.find(t => t.length <= TITLE_LIMIT) ?? candidates[candidates.length - 1];
   }
 
+  const descNoAPY = (() => {
+    const d1 = `${p.product_name} on ${p.platform_name}: ${T} yield strategy on ${p.network}. TVL: ${tvl}. Compare with ${T} yields. Yield data updated daily on Earnbase.`;
+    const d2 = `${p.product_name} on ${p.platform_name}: ${T} yield strategy on ${p.network}. TVL: ${tvl}. Yield data tracked daily on Earnbase.`;
+    return [d1, d2].find(d => d.length <= 155) ?? d2;
+  })();
+
   const description = showAPY
     ? `${p.product_name} on ${p.platform_name} generates ${apy}% on-chain APY on ${T} (${p.network}). TVL: ${tvl}. Yield data tracked daily on Earnbase.`
-    : `${p.product_name} on ${p.platform_name}: ${T} yield strategy on ${p.network}. TVL: ${tvl}. Yield data tracked daily on Earnbase.`;
+    : descNoAPY;
 
   const url = `${BASE}/vault/${slug}`;
   const breadcrumb = `${BASE} › vault › ${slug}`;
