@@ -191,7 +191,7 @@ function SeoHealthCard({ result }: { result: SeoScore }) {
   return (
     <div className="p-4 bg-muted/30 rounded-xl border border-border">
       <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider mb-3">SEO Health</p>
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-4 sm:gap-6">
         <div className="shrink-0 flex flex-col items-center justify-center w-20">
           <span className={`text-4xl font-bold tabular-nums ${scoreColor}`}>{score}</span>
           <span className={`text-[11px] font-semibold mt-0.5 ${scoreColor}`}>{label}</span>
@@ -252,7 +252,9 @@ function AuditTable({ products, sortCol, sortDir, onSort, onSelectProduct }: {
       <table className="w-full text-[12px] border-collapse">
         <thead className="bg-muted/40 border-b border-border sticky top-0 z-10">
           <tr>
-            <SortableHeader col="name"  label="Product"       current={sortCol} dir={sortDir} onSort={onSort} />
+            <th className="sticky left-0 z-20 bg-muted/40 px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider cursor-pointer select-none whitespace-nowrap text-muted-foreground hover:text-foreground transition-colors" onClick={() => onSort('name')}>
+              Product<span className={`ml-1 ${sortCol === 'name' ? 'text-[#08a671]' : 'text-muted-foreground/30'}`}>{sortCol === 'name' ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}</span>
+            </th>
             <SortableHeader col="score" label="Score"         current={sortCol} dir={sortDir} onSort={onSort} />
             <SortableHeader col="title" label="Title length"  current={sortCol} dir={sortDir} onSort={onSort} />
             <SortableHeader col="desc"  label="Desc length"   current={sortCol} dir={sortDir} onSort={onSort} />
@@ -275,8 +277,8 @@ function AuditTable({ products, sortCol, sortDir, onSort, onSelectProduct }: {
                 onClick={() => onSelectProduct(p)}
                 className={`border-b border-border/50 cursor-pointer transition-colors ${rowBg}`}
               >
-                {/* Product */}
-                <td className="px-3 py-2.5 max-w-[220px]">
+                {/* Product — sticky on mobile */}
+                <td className="px-3 py-2.5 max-w-[180px] sm:max-w-[220px] sticky left-0 bg-inherit z-[1]">
                   <p className="font-semibold text-foreground truncate">{p.product_name}</p>
                   <p className="text-[11px] text-muted-foreground truncate">{p.platform_name} · {p.ticker.toUpperCase()} · {p.network}</p>
                 </td>
@@ -322,30 +324,32 @@ function DesktopResult({ title, description, breadcrumb, faq }: {
   const descDisplay  = description.length > 160 ? description.slice(0, 157) + '...' : description;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 max-w-[600px] font-sans">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-          <span className="text-white text-[9px] font-bold">E</span>
+    <div className="overflow-x-auto">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 w-full max-w-[600px] min-w-[280px] font-sans">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+            <span className="text-white text-[9px] font-bold">E</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[13px] text-gray-800 leading-none">Earnbase</p>
+            <p className="text-[12px] text-gray-500 leading-none mt-0.5 truncate">{breadcrumb}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-[13px] text-gray-800 leading-none">Earnbase</p>
-          <p className="text-[12px] text-gray-500 leading-none mt-0.5 truncate max-w-[480px]">{breadcrumb}</p>
+        <h3 className="text-[18px] sm:text-[20px] text-[#1a0dab] font-normal leading-snug hover:underline cursor-pointer mt-1">
+          {titleDisplay}
+        </h3>
+        <p className="text-[13px] sm:text-[14px] text-gray-600 leading-snug mt-1">{descDisplay}</p>
+        <div className="mt-3 space-y-1.5 border-t border-gray-100 pt-3">
+          {faq.slice(0, 2).map((item, i) => (
+            <details key={i} className="group">
+              <summary className="text-[13px] sm:text-[14px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between gap-2">
+                <span>{item.q}</span>
+                <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform shrink-0">▾</span>
+              </summary>
+              <p className="text-[12px] sm:text-[13px] text-gray-600 mt-1 pl-2">{item.a}</p>
+            </details>
+          ))}
         </div>
-      </div>
-      <h3 className="text-[20px] text-[#1a0dab] font-normal leading-snug hover:underline cursor-pointer mt-1">
-        {titleDisplay}
-      </h3>
-      <p className="text-[14px] text-gray-600 leading-snug mt-1">{descDisplay}</p>
-      <div className="mt-3 space-y-1.5 border-t border-gray-100 pt-3">
-        {faq.slice(0, 2).map((item, i) => (
-          <details key={i} className="group">
-            <summary className="text-[14px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between">
-              {item.q}
-              <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform">▾</span>
-            </summary>
-            <p className="text-[13px] text-gray-600 mt-1 pl-2">{item.a}</p>
-          </details>
-        ))}
       </div>
     </div>
   );
@@ -360,14 +364,14 @@ function MobileResult({ title, description, breadcrumb, faq }: {
   const descDisplay  = description.length > 130 ? description.slice(0, 127) + '...' : description;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 w-[360px] font-sans">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 w-full max-w-[360px] font-sans">
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+        <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center shrink-0">
           <span className="text-white text-[8px] font-bold">E</span>
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-[12px] text-gray-800 leading-none">Earnbase</p>
-          <p className="text-[11px] text-gray-500 leading-none mt-0.5 truncate max-w-[300px]">{breadcrumb}</p>
+          <p className="text-[11px] text-gray-500 leading-none mt-0.5 truncate">{breadcrumb}</p>
         </div>
       </div>
       <h3 className="text-[18px] text-[#1a0dab] font-normal leading-snug mt-1">
@@ -377,9 +381,9 @@ function MobileResult({ title, description, breadcrumb, faq }: {
       <div className="mt-3 space-y-1.5 border-t border-gray-100 pt-3">
         {faq.slice(0, 2).map((item, i) => (
           <details key={i} className="group">
-            <summary className="text-[13px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between">
-              {item.q.length > 55 ? item.q.slice(0, 52) + '...' : item.q}
-              <span className="text-gray-400 text-xs">▾</span>
+            <summary className="text-[13px] text-[#1a0dab] cursor-pointer list-none flex items-center justify-between gap-2">
+              <span>{item.q.length > 55 ? item.q.slice(0, 52) + '...' : item.q}</span>
+              <span className="text-gray-400 text-xs shrink-0">▾</span>
             </summary>
             <p className="text-[12px] text-gray-600 mt-1 pl-2">{item.a}</p>
           </details>
@@ -398,6 +402,7 @@ export function SerpViewPanel() {
   const [view, setView] = useState<'preview' | 'audit'>('preview');
   const [sortCol, setSortCol] = useState<SortCol>('score');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [mobileFocus, setMobileFocus] = useState<'list' | 'detail'>('list');
 
   useEffect(() => {
     fetchPools().then(({ products }) => {
@@ -445,22 +450,28 @@ export function SerpViewPanel() {
   const tabInactive = 'px-4 py-2 text-[12px] text-muted-foreground hover:text-foreground transition-colors';
 
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-220px)] min-h-[600px]">
+    <div className="flex flex-col gap-3 h-[calc(100vh-180px)] sm:h-[calc(100vh-220px)] min-h-[500px]">
 
       {/* ── View toggle + search bar ── */}
-      <div className="flex items-center justify-between gap-4 shrink-0">
-        {/* Tab bar */}
-        <div className="flex border border-border rounded-xl overflow-hidden">
-          <button onClick={() => setView('preview')} className={view === 'preview' ? tabActive : tabInactive}>
-            Preview
-          </button>
-          <button onClick={() => setView('audit')} className={view === 'audit' ? tabActive : tabInactive}>
-            Audit Table
-          </button>
+      <div className="flex flex-col gap-2 shrink-0">
+        {/* Row 1: tabs + stats */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex border border-border rounded-xl overflow-hidden">
+            <button onClick={() => { setView('preview'); setMobileFocus('list'); }} className={view === 'preview' ? tabActive : tabInactive}>
+              Preview
+            </button>
+            <button onClick={() => setView('audit')} className={view === 'audit' ? tabActive : tabInactive}>
+              Audit Table
+            </button>
+          </div>
+          {view === 'audit' && !loading && (
+            <p className="text-[11px] text-muted-foreground">
+              {filtered.length} · <span className="text-red-500">{filtered.filter(p => computeSeoScore(p).score < 60).length} poor</span> · <span className="text-yellow-600">{filtered.filter(p => { const s = computeSeoScore(p).score; return s >= 60 && s < 80; }).length} attention</span>
+            </p>
+          )}
         </div>
-
-        {/* Search + export */}
-        <div className="flex items-center gap-2 flex-1 max-w-sm">
+        {/* Row 2: search + export */}
+        <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
@@ -473,19 +484,12 @@ export function SerpViewPanel() {
           {view === 'audit' && (
             <button
               onClick={() => exportCSV(filtered)}
-              className="text-[11px] px-3 py-2 rounded-xl border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+              className="text-[11px] px-3 py-2 rounded-xl border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap shrink-0"
             >
               Export CSV
             </button>
           )}
         </div>
-
-        {/* Audit stats summary */}
-        {view === 'audit' && !loading && (
-          <p className="text-[11px] text-muted-foreground shrink-0">
-            {filtered.length} products · {filtered.filter(p => computeSeoScore(p).score < 60).length} poor · {filtered.filter(p => { const s = computeSeoScore(p).score; return s >= 60 && s < 80; }).length} needs attention
-          </p>
-        )}
       </div>
 
       {/* ── Content area ── */}
@@ -507,10 +511,13 @@ export function SerpViewPanel() {
         </div>
       ) : (
         // ── PREVIEW ──
-        <div className="flex gap-6 flex-1 min-h-0">
+        // On mobile: block container (one panel at a time). On sm+: flex row (two columns).
+        <div className="flex-1 min-h-0 overflow-hidden sm:flex sm:gap-6">
 
           {/* Left: product list */}
-          <div className="w-72 shrink-0 flex flex-col gap-2 min-h-0">
+          <div className={`flex-col gap-2 h-full sm:h-auto sm:w-72 sm:shrink-0 sm:min-h-0 ${
+            mobileFocus === 'detail' ? 'hidden sm:flex' : 'flex'
+          }`}>
             <button
               onClick={() => handleSort('score')}
               className={`text-[11px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-colors shrink-0 ${
@@ -527,7 +534,7 @@ export function SerpViewPanel() {
               {filtered.map(p => (
                 <button
                   key={p.id}
-                  onClick={() => setSelected(p)}
+                  onClick={() => { setSelected(p); setMobileFocus('detail'); }}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-[12px] transition-colors ${
                     selected?.id === p.id
                       ? 'bg-[#08a671]/10 border border-[#08a671]/30 text-foreground'
@@ -545,7 +552,17 @@ export function SerpViewPanel() {
           </div>
 
           {/* Right: SERP previews */}
-          <div className="flex-1 overflow-y-auto space-y-8">
+          <div className={`h-full overflow-y-auto space-y-6 sm:h-auto sm:flex-1 ${
+            mobileFocus === 'list' ? 'hidden sm:block' : 'block'
+          }`}>
+            {/* Mobile back button */}
+            <button
+              onClick={() => setMobileFocus('list')}
+              className="sm:hidden flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors mb-1"
+            >
+              ← All products
+            </button>
+
             {!seo && !loading && (
               <p className="text-muted-foreground text-sm mt-10 text-center">Select a product to preview</p>
             )}
@@ -614,15 +631,15 @@ export function SerpViewPanel() {
                   <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider">Raw Values</p>
                   <div>
                     <p className="text-[11px] text-muted-foreground mb-0.5">Title tag</p>
-                    <p className="text-[13px] text-foreground font-mono bg-background px-2 py-1 rounded">{seo.title}</p>
+                    <p className="text-[12px] text-foreground font-mono bg-background px-2 py-1 rounded break-all">{seo.title}</p>
                   </div>
                   <div>
                     <p className="text-[11px] text-muted-foreground mb-0.5">Meta description</p>
-                    <p className="text-[13px] text-foreground font-mono bg-background px-2 py-1 rounded">{seo.description}</p>
+                    <p className="text-[12px] text-foreground font-mono bg-background px-2 py-1 rounded break-all">{seo.description}</p>
                   </div>
                   <div>
                     <p className="text-[11px] text-muted-foreground mb-0.5">Canonical URL</p>
-                    <p className="text-[13px] text-[#08a671] font-mono bg-background px-2 py-1 rounded">https://{seo.url}</p>
+                    <p className="text-[12px] text-[#08a671] font-mono bg-background px-2 py-1 rounded break-all">https://{seo.url}</p>
                   </div>
                 </div>
               </>
