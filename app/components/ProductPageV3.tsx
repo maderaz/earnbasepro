@@ -16,6 +16,7 @@ import { ApyChart, TvlChart } from './vault/VaultCharts';
 import { VaultAnalytics } from './vault/VaultAnalytics';
 import { KVRow } from './ui/KVRow';
 import { EarningsCalculator } from './vault/EarningsCalculator';
+import * as api from '@/app/utils/api';
 
 const REF_TAG = 'ref=earnbase.finance';
 const HISTORY_PAGE_SIZE = 7;
@@ -125,6 +126,19 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
   const slug = getProductSlug(product);
   const icon = resolveAssetIcon(product.ticker);
 
+  const onTrack = () => api.trackClick({
+    slug,
+    productName: product.product_name,
+    platform: product.platform_name,
+    ticker: product.ticker,
+    network: product.network,
+    curator: product.curator || '',
+    productLink: product.product_link,
+    apyAtClick: product.spotAPY,
+    tvlAtClick: product.tvl,
+    defillamaId: String(product.id || ''),
+  });
+
   return (
     <div className="animate-in fade-in duration-700">
       {/* Sticky sub-header */}
@@ -143,6 +157,7 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
             {product.product_link && (
               <a href={`${product.product_link}${product.product_link.includes('?') ? '&' : '?'}${REF_TAG}`}
                 target="_blank" rel="noopener noreferrer"
+                onClick={onTrack}
                 className="relative flex items-center gap-2 px-4 py-2 bg-[#08a671] hover:bg-[#079963] rounded-[10px] text-[12px] font-semibold text-white transition-all shrink-0 shadow-[inset_0px_-4px_0px_0px_rgba(0,0,0,0.18)] pt-[6px] pb-[10px]">
                 Open Product <ExternalLink className="w-3 h-3 text-white" />
               </a>
@@ -178,6 +193,7 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
           <div className="sm:hidden px-5 pt-4 pb-1">
             <a href={`${product.product_link}${product.product_link.includes('?') ? '&' : '?'}${REF_TAG}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={onTrack}
               className="flex items-center justify-center gap-2 w-full pt-[10px] pb-[14px] bg-[#08a671] hover:bg-[#079963] rounded-[10px] text-[13px] font-semibold text-white transition-all shadow-[inset_0px_-4px_0px_0px_rgba(0,0,0,0.18)]">
               Open Product <ExternalLink className="w-3.5 h-3.5" />
             </a>
@@ -237,6 +253,7 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
               <div className="hidden lg:block pb-4 mb-1 border-b border-[#eff0f4] dark:border-border/20">
                 <a href={`${product.product_link}${product.product_link.includes('?') ? '&' : '?'}${REF_TAG}`}
                   target="_blank" rel="noopener noreferrer"
+                  onClick={onTrack}
                   className="flex items-center justify-center gap-2 w-full pt-[10px] pb-[14px] bg-[#08a671] hover:bg-[#079963] rounded-[10px] text-[13px] font-semibold text-white transition-all shadow-[inset_0px_-4px_0px_0px_rgba(0,0,0,0.18)]">
                   Open Product <ExternalLink className="w-3.5 h-3.5" />
                 </a>
@@ -386,6 +403,7 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
               {product.product_link && (
                 <a href={`${product.product_link}${product.product_link.includes('?') ? '&' : '?'}${REF_TAG}`}
                   target="_blank" rel="noopener noreferrer"
+                  onClick={onTrack}
                   className="inline-flex items-center gap-2 text-[13px] font-medium text-[#08a671] hover:underline shrink-0">
                   Deposit Asset <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>

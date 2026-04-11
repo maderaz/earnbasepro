@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useRegistry } from '../hooks/useRegistry';
 import { getProductSlug, slugify } from '@/app/utils/slugify';
 import { formatTVL, formatAPY } from '@/app/utils/formatters';
+import * as api from '@/app/utils/api';
 import type { DeFiProduct } from '@/lib/api';
 
 interface TableProps {
@@ -41,6 +42,8 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchTrackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTrackedQuery = useRef('');
 
   useEffect(() => {
     if (params.network) {
@@ -136,6 +139,32 @@ export const TrackerTable: React.FC<TableProps> = ({ products, loading, allTicke
       : p.ticker?.toUpperCase() === selectedTicker;
     return matchesSearch && matchesNet && matchesTvl && matchesTicker;
   }), [sortedProducts, searchTerm, selectedNetwork, minTVL, selectedTicker, params.ticker, checkNetworkMatch]);
+
+  // Debounced search tracking — fire after 1s pause, minimum 2 chars, deduplicated
+  useEffect(() => {
+    if (searchTrackTimer.current) clearTimeout(searchTrackTimer.current);
+    const trimmed = searchTerm.trim();
+    if (trimmed.length < 2 || trimmed.toLowerCase() === lastTrackedQuery.current) return;
+    searchTrackTimer.current = setTimeout(() => {
+      const q = trimmed.toLowerCase();
+      const resultsCount = sortedProducts.filter(p =>
+        (p.platform_name?.toLowerCase() || '').includes(q) ||
+        (p.product_name?.toLowerCase() || '').includes(q) ||
+        (p.network?.toLowerCase() || '').includes(q) ||
+        (p.ticker?.toLowerCase() || '').includes(q) ||
+        (p.curator?.toLowerCase() || '').includes(q)
+      ).length;
+      lastTrackedQuery.current = trimmed.toLowerCase();
+      api.trackSearch({
+        query: trimmed,
+        resultsCount,
+        pageContext: pathname,
+        tickerContext: (params.ticker as string) || '',
+        networkContext: (params.network as string) || '',
+      });
+    }, 1000);
+    return () => { if (searchTrackTimer.current) clearTimeout(searchTrackTimer.current); };
+  }, [searchTerm, sortedProducts, pathname, params.ticker, params.network]);
 
   // Reset pagination when filters change
   useEffect(() => { setDisplayCount(100); }, [searchTerm, selectedNetwork, minTVL, selectedTicker]);
