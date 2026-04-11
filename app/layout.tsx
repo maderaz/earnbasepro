@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Layout } from './components/Layout';
 import { PageViewTracker } from './components/PageViewTracker';
 import './globals.css';
@@ -40,10 +41,13 @@ export default function RootLayout({
         <meta name="theme-color" content="#3f7359" />
         <link rel="llms-txt" href="/llms.txt" />
         <link rel="llms-full-txt" href="/llms-full.txt" />
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="https://analytics.ahrefs.com/analytics.js" data-key="K7Y/vLlOIVE0pT/X/C8ADA" async />
       </head>
       <body className="bg-background text-foreground antialiased">
+        <Script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="K7Y/vLlOIVE0pT/X/C8ADA"
+          strategy="afterInteractive"
+        />
         <PageViewTracker />
         <Layout>{children}</Layout>
       </body>
