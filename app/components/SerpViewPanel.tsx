@@ -252,7 +252,9 @@ function AuditTable({ products, sortCol, sortDir, onSort, onSelectProduct }: {
       <table className="w-full text-[12px] border-collapse">
         <thead className="bg-muted/40 border-b border-border sticky top-0 z-10">
           <tr>
-            <SortableHeader col="name"  label="Product"       current={sortCol} dir={sortDir} onSort={onSort} />
+            <th className="sticky left-0 z-20 bg-muted/40 px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider cursor-pointer select-none whitespace-nowrap text-muted-foreground hover:text-foreground transition-colors" onClick={() => onSort('name')}>
+              Product<span className={`ml-1 ${sortCol === 'name' ? 'text-[#08a671]' : 'text-muted-foreground/30'}`}>{sortCol === 'name' ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}</span>
+            </th>
             <SortableHeader col="score" label="Score"         current={sortCol} dir={sortDir} onSort={onSort} />
             <SortableHeader col="title" label="Title length"  current={sortCol} dir={sortDir} onSort={onSort} />
             <SortableHeader col="desc"  label="Desc length"   current={sortCol} dir={sortDir} onSort={onSort} />
@@ -275,8 +277,8 @@ function AuditTable({ products, sortCol, sortDir, onSort, onSelectProduct }: {
                 onClick={() => onSelectProduct(p)}
                 className={`border-b border-border/50 cursor-pointer transition-colors ${rowBg}`}
               >
-                {/* Product */}
-                <td className="px-3 py-2.5 max-w-[220px]">
+                {/* Product — sticky on mobile */}
+                <td className="px-3 py-2.5 max-w-[180px] sm:max-w-[220px] sticky left-0 bg-inherit z-[1]">
                   <p className="font-semibold text-foreground truncate">{p.product_name}</p>
                   <p className="text-[11px] text-muted-foreground truncate">{p.platform_name} · {p.ticker.toUpperCase()} · {p.network}</p>
                 </td>
@@ -398,6 +400,7 @@ export function SerpViewPanel() {
   const [view, setView] = useState<'preview' | 'audit'>('preview');
   const [sortCol, setSortCol] = useState<SortCol>('score');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [mobileFocus, setMobileFocus] = useState<'list' | 'detail'>('list');
 
   useEffect(() => {
     fetchPools().then(({ products }) => {
@@ -445,22 +448,28 @@ export function SerpViewPanel() {
   const tabInactive = 'px-4 py-2 text-[12px] text-muted-foreground hover:text-foreground transition-colors';
 
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-220px)] min-h-[600px]">
+    <div className="flex flex-col gap-3 h-[calc(100vh-180px)] sm:h-[calc(100vh-220px)] min-h-[500px]">
 
       {/* ── View toggle + search bar ── */}
-      <div className="flex items-center justify-between gap-4 shrink-0">
-        {/* Tab bar */}
-        <div className="flex border border-border rounded-xl overflow-hidden">
-          <button onClick={() => setView('preview')} className={view === 'preview' ? tabActive : tabInactive}>
-            Preview
-          </button>
-          <button onClick={() => setView('audit')} className={view === 'audit' ? tabActive : tabInactive}>
-            Audit Table
-          </button>
+      <div className="flex flex-col gap-2 shrink-0">
+        {/* Row 1: tabs + stats */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex border border-border rounded-xl overflow-hidden">
+            <button onClick={() => { setView('preview'); setMobileFocus('list'); }} className={view === 'preview' ? tabActive : tabInactive}>
+              Preview
+            </button>
+            <button onClick={() => setView('audit')} className={view === 'audit' ? tabActive : tabInactive}>
+              Audit Table
+            </button>
+          </div>
+          {view === 'audit' && !loading && (
+            <p className="text-[11px] text-muted-foreground">
+              {filtered.length} · <span className="text-red-500">{filtered.filter(p => computeSeoScore(p).score < 60).length} poor</span> · <span className="text-yellow-600">{filtered.filter(p => { const s = computeSeoScore(p).score; return s >= 60 && s < 80; }).length} attention</span>
+            </p>
+          )}
         </div>
-
-        {/* Search + export */}
-        <div className="flex items-center gap-2 flex-1 max-w-sm">
+        {/* Row 2: search + export */}
+        <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
@@ -473,19 +482,12 @@ export function SerpViewPanel() {
           {view === 'audit' && (
             <button
               onClick={() => exportCSV(filtered)}
-              className="text-[11px] px-3 py-2 rounded-xl border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+              className="text-[11px] px-3 py-2 rounded-xl border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap shrink-0"
             >
               Export CSV
             </button>
           )}
         </div>
-
-        {/* Audit stats summary */}
-        {view === 'audit' && !loading && (
-          <p className="text-[11px] text-muted-foreground shrink-0">
-            {filtered.length} products · {filtered.filter(p => computeSeoScore(p).score < 60).length} poor · {filtered.filter(p => { const s = computeSeoScore(p).score; return s >= 60 && s < 80; }).length} needs attention
-          </p>
-        )}
       </div>
 
       {/* ── Content area ── */}
@@ -509,8 +511,8 @@ export function SerpViewPanel() {
         // ── PREVIEW ──
         <div className="flex gap-6 flex-1 min-h-0">
 
-          {/* Left: product list */}
-          <div className="w-72 shrink-0 flex flex-col gap-2 min-h-0">
+          {/* Left: product list — hidden on mobile when detail is focused */}
+          <div className={`w-full sm:w-72 sm:shrink-0 flex-col gap-2 min-h-0 ${mobileFocus === 'detail' ? 'hidden sm:flex' : 'flex'}`}>
             <button
               onClick={() => handleSort('score')}
               className={`text-[11px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-colors shrink-0 ${
@@ -527,7 +529,7 @@ export function SerpViewPanel() {
               {filtered.map(p => (
                 <button
                   key={p.id}
-                  onClick={() => setSelected(p)}
+                  onClick={() => { setSelected(p); setMobileFocus('detail'); }}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-[12px] transition-colors ${
                     selected?.id === p.id
                       ? 'bg-[#08a671]/10 border border-[#08a671]/30 text-foreground'
@@ -544,8 +546,16 @@ export function SerpViewPanel() {
             </div>
           </div>
 
-          {/* Right: SERP previews */}
-          <div className="flex-1 overflow-y-auto space-y-8">
+          {/* Right: SERP previews — hidden on mobile when list is focused */}
+          <div className={`flex-1 overflow-y-auto space-y-6 ${mobileFocus === 'list' ? 'hidden sm:block' : 'block'}`}>
+            {/* Mobile back button */}
+            <button
+              onClick={() => setMobileFocus('list')}
+              className="sm:hidden flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors mb-1"
+            >
+              ← All products
+            </button>
+
             {!seo && !loading && (
               <p className="text-muted-foreground text-sm mt-10 text-center">Select a product to preview</p>
             )}
