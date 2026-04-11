@@ -53,13 +53,19 @@ const APY_THRESHOLDS: Record<string, number> = {
 const shouldShowAPY = (ticker: string, spotAPY: number): boolean =>
   spotAPY >= (APY_THRESHOLDS[ticker.toUpperCase()] ?? 0.50);
 
-function buildVaultTitle(fullName: string, shortName: string, apyRaw: string | null, slug: string): string {
+function buildVaultTitle(fullName: string, shortName: string, apyRaw: string | null, slug: string, platform?: string, network?: string): string {
   const candidates: string[] = [];
   if (apyRaw) {
     candidates.push(`${fullName} - ${apyRaw}% APY | Earnbase`);
     candidates.push(`${shortName} - ${apyRaw}% APY | Earnbase`);
     candidates.push(`${fullName} - ${apyRaw}% APY`);
     candidates.push(`${shortName} - ${apyRaw}% APY`);
+  }
+  // When APY is not shown, enrich with platform/network context to avoid short titles
+  if (!apyRaw && platform && network) {
+    candidates.push(`${fullName} on ${platform} (${network}) | Earnbase`);
+    candidates.push(`${fullName} on ${platform} | Earnbase`);
+    candidates.push(`${shortName} on ${platform} | Earnbase`);
   }
   candidates.push(`${fullName} | Earnbase`);
   candidates.push(`${shortName} | Earnbase`);
@@ -247,7 +253,7 @@ export function vaultProductSEO(
   const fullName = productName;
   const shortName = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
   const apyRaw = showAPY ? formatAPYRaw(currentAPY) : null;
-  const title = buildVaultTitle(fullName, shortName, apyRaw, slug);
+  const title = buildVaultTitle(fullName, shortName, apyRaw, slug, platform, network);
   const apy = formatAPY(currentAPY);
   const tvlStr = formatTVLCompact(tvl);
   const hc = hubCount || 0;
@@ -260,8 +266,10 @@ export function vaultProductSEO(
     const full = `${base} Compare with ${hc}+ ${T} strategies on Earnbase.`;
     description = full.length <= 155 ? full : base;
   } else {
-    const full = `${productName} on ${platform} — ${T} yield strategy on ${network}. Compare with ${hc}+ ${T} strategies on Earnbase.`;
-    description = full.length <= 155 ? full : `${productName} on ${platform} — ${T} yield strategy on ${network}.`;
+    const d1 = `${productName} on ${platform}: ${T} yield strategy on ${network}. TVL: ${tvlStr}. Compare with ${hc}+ ${T} strategies on Earnbase.`;
+    const d2 = `${productName} on ${platform}: ${T} yield strategy on ${network}. TVL: ${tvlStr}. Yield data tracked daily on Earnbase.`;
+    const d3 = `${productName} on ${platform} — ${T} yield strategy on ${network}. TVL: ${tvlStr}.`;
+    description = [d1, d2, d3].find(d => d.length <= 155) ?? d3;
   }
 
   const graph: any[] = [
