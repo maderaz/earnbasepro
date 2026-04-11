@@ -63,6 +63,60 @@ function buildVaultSEO(p: DeFiProduct) {
   return { title, description, url, breadcrumb, faq, showAPY };
 }
 
+// ── SEO Health Score ──────────────────────────────────────────────────────────
+type SeoScore = {
+  score: number;
+  label: string;
+  issues: string[];
+  checks: { label: string; pass: boolean }[];
+};
+
+function computeSeoScore(p: DeFiProduct): SeoScore {
+  const seo = buildVaultSEO(p);
+  let score = 100;
+  const issues: string[] = [];
+
+  if (seo.title.length > 60) {
+    score -= 20;
+    issues.push(`Title too long (${seo.title.length}/60 chars)`);
+  } else if (seo.title.length < 25) {
+    score -= 10;
+    issues.push(`Title too short (${seo.title.length} chars)`);
+  }
+
+  if (seo.description.length > 155) {
+    score -= 20;
+    issues.push(`Description too long (${seo.description.length}/155 chars)`);
+  } else if (seo.description.length < 100) {
+    score -= 10;
+    issues.push(`Description too short (${seo.description.length} chars)`);
+  }
+
+  if (!seo.showAPY) {
+    score -= 15;
+    issues.push('APY below threshold \u2014 not shown in title');
+  }
+
+  if (p.spotAPY === 0) {
+    score -= 5;
+    issues.push('Spot APY is 0%');
+  }
+
+  const finalScore = Math.max(0, score);
+  const label = finalScore >= 80 ? 'Good' : finalScore >= 60 ? 'Needs attention' : 'Poor';
+
+  const checks = [
+    { label: `Title \u2264 60 chars (${seo.title.length})`, pass: seo.title.length <= 60 },
+    { label: 'Title \u2265 25 chars', pass: seo.title.length >= 25 },
+    { label: `Description \u2264 155 chars (${seo.description.length})`, pass: seo.description.length <= 155 },
+    { label: 'Description \u2265 100 chars', pass: seo.description.length >= 100 },
+    { label: 'APY shown in title', pass: seo.showAPY },
+    { label: 'Spot APY > 0%', pass: p.spotAPY > 0 },
+  ];
+
+  return { score: finalScore, label, issues, checks };
+}
+
 // ── Character count badge ─────────────────────────────────────────────────────
 function CharBadge({ count, max, warn }: { count: number; max: number; warn: number }) {
   const ok = count <= max;
@@ -77,6 +131,58 @@ function CharBadge({ count, max, warn }: { count: number; max: number; warn: num
       {red || yellow ? <AlertTriangle className="w-3 h-3" /> : <CheckCircle className="w-3 h-3" />}
       {count}/{max}
     </span>
+  );
+}
+
+// ── Score badge for product list ──────────────────────────────────────────────
+function ScoreBadge({ score }: { score: number }) {
+  const color = score >= 80
+    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+    : score >= 60
+    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+    : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400';
+  return (
+    <span className={`inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded-full tabular-nums shrink-0 ${color}`}>
+      {score}
+    </span>
+  );
+}
+
+// ── SEO Health Card ───────────────────────────────────────────────────────────
+function SeoHealthCard({ result }: { result: SeoScore }) {
+  const { score, label, issues, checks } = result;
+  const scoreColor = score >= 80
+    ? 'text-green-600 dark:text-green-400'
+    : score >= 60
+    ? 'text-yellow-600 dark:text-yellow-400'
+    : 'text-red-600 dark:text-red-400';
+  return (
+    <div className="p-4 bg-muted/30 rounded-xl border border-border">
+      <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider mb-3">SEO Health</p>
+      <div className="flex gap-6">
+        <div className="shrink-0 flex flex-col items-center justify-center w-20">
+          <span className={`text-4xl font-bold tabular-nums ${scoreColor}`}>{score}</span>
+          <span className={`text-[11px] font-semibold mt-0.5 ${scoreColor}`}>{label}</span>
+          {issues.length > 0 && (
+            <span className="text-[10px] text-muted-foreground mt-1">
+              {issues.length} issue{issues.length > 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
+        <div className="flex-1 space-y-1.5">
+          {checks.map((c, i) => (
+            <div key={i} className="flex items-center gap-2">
+              {c.pass
+                ? <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                : <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+              <span className={`text-[12px] ${c.pass ? 'text-muted-foreground' : 'text-red-600 dark:text-red-400 font-medium'}`}>
+                {c.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -166,6 +272,7 @@ export function SerpViewPanel() {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<DeFiProduct | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sortByScore, setSortByScore] = useState(false);
 
   useEffect(() => {
     fetchPools().then(({ products }) => {
@@ -176,17 +283,21 @@ export function SerpViewPanel() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!query) return products.slice(0, 80);
     const q = query.toLowerCase();
-    return products.filter(p =>
-      p.product_name.toLowerCase().includes(q) ||
-      p.platform_name.toLowerCase().includes(q) ||
-      p.ticker.toLowerCase().includes(q) ||
-      p.network.toLowerCase().includes(q)
-    ).slice(0, 80);
-  }, [products, query]);
+    const base = !query
+      ? products.slice(0, 80)
+      : products.filter(p =>
+          p.product_name.toLowerCase().includes(q) ||
+          p.platform_name.toLowerCase().includes(q) ||
+          p.ticker.toLowerCase().includes(q) ||
+          p.network.toLowerCase().includes(q)
+        ).slice(0, 80);
+    if (!sortByScore) return base;
+    return [...base].sort((a, b) => computeSeoScore(a).score - computeSeoScore(b).score);
+  }, [products, query, sortByScore]);
 
   const seo = selected ? buildVaultSEO(selected) : null;
+  const seoScore = selected ? computeSeoScore(selected) : null;
 
   return (
     <div className="flex gap-6 h-[calc(100vh-220px)] min-h-[600px]">
@@ -202,6 +313,16 @@ export function SerpViewPanel() {
             className="w-full pl-8 pr-3 py-2 text-[13px] bg-muted/50 border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-[#08a671]"
           />
         </div>
+        <button
+          onClick={() => setSortByScore(v => !v)}
+          className={`text-[11px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-colors ${
+            sortByScore
+              ? 'bg-[#08a671]/10 border-[#08a671]/30 text-[#08a671]'
+              : 'bg-muted/50 border-border text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {sortByScore ? '↑ Worst score first' : 'Sort by SEO score'}
+        </button>
 
         <div className="flex-1 overflow-y-auto space-y-1 pr-1">
           {loading && <p className="text-[13px] text-muted-foreground p-2">Loading...</p>}
@@ -215,7 +336,10 @@ export function SerpViewPanel() {
                   : 'hover:bg-muted/60 text-muted-foreground border border-transparent'
               }`}
             >
-              <p className="font-semibold text-foreground truncate">{p.product_name}</p>
+              <div className="flex items-center justify-between gap-1 mb-0.5">
+                <p className="font-semibold text-foreground truncate flex-1">{p.product_name}</p>
+                <ScoreBadge score={computeSeoScore(p).score} />
+              </div>
               <p className="text-[11px] text-muted-foreground truncate">{p.platform_name} · {p.ticker.toUpperCase()} · {p.network}</p>
             </button>
           ))}
@@ -228,8 +352,11 @@ export function SerpViewPanel() {
           <p className="text-muted-foreground text-sm mt-10 text-center">Select a product to preview</p>
         )}
 
-        {seo && (
+        {seo && seoScore && (
           <>
+            {/* SEO Health Score */}
+            <SeoHealthCard result={seoScore} />
+
             {/* Character count indicators */}
             <div className="flex flex-wrap gap-4 p-4 bg-muted/30 rounded-xl border border-border text-[13px]">
               <div className="flex items-center gap-2">
