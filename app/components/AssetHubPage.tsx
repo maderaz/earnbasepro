@@ -33,9 +33,10 @@ interface Props {
   ticker: string;
   products: DeFiProduct[];
   allTickers: string[];
+  initialNetwork?: string;
 }
 
-export const AssetHubPage: React.FC<Props> = ({ ticker, products, allTickers }) => {
+export const AssetHubPage: React.FC<Props> = ({ ticker, products, allTickers, initialNetwork }) => {
   const router = useRouter();
   const { resolveAssetIcon, resolveNetworkIcon, resolveNetworkName, matchesNetwork: checkNetworkMatch, getAllNetworks } = useRegistry();
 
@@ -48,7 +49,7 @@ export const AssetHubPage: React.FC<Props> = ({ ticker, products, allTickers }) 
 
   // ── State ──────────────────────────────────────────────────
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedNetwork, setSelectedNetwork] = useState('all');
+  const [selectedNetwork, setSelectedNetwork] = useState(initialNetwork || 'all');
   const [minTVL, setMinTVL] = useState(0);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' } | null>(
     { key: 'spotAPY', direction: 'desc' },
