@@ -72,8 +72,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Vault pages: /vault/{slug}
+  // Exclude dead vaults — same condition as noindex in vault page generateMetadata:
+  // TVL < $5,000 AND 30-day APY = 0. Including noindex pages in the sitemap is contradictory.
   const vaultUrls: MetadataRoute.Sitemap = products
-    .filter(p => VALID_TICKERS.includes((p.ticker || '').toLowerCase()))
+    .filter(p =>
+      VALID_TICKERS.includes((p.ticker || '').toLowerCase()) &&
+      !((p.tvl ?? 0) < 5000 && (p.monthlyAPY ?? 0) === 0)
+    )
     .map(p => ({
       url: `${BASE_URL}/vault/${getProductSlug(p)}`,
       lastModified: now,
