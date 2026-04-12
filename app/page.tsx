@@ -22,6 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: seo.description,
     alternates: { canonical: BASE_URL },
     openGraph: {
+      type: 'website',
       title: seo.title,
       description: seo.description,
       url: BASE_URL,
