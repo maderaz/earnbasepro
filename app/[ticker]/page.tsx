@@ -68,10 +68,9 @@ export default async function AssetHubPage({ params }: Props) {
   products.forEach(p => tickerCounts.set(p.ticker.toUpperCase(), (tickerCounts.get(p.ticker.toUpperCase()) || 0) + 1));
   const allTickers = [...tickerCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
 
-  // Strip history arrays from products before passing as page props — these arrays
-  // (dailyApyHistory, tvlHistory) can be hundreds of KB and are not used by any
-  // component on this page. They are only needed on individual vault pages.
-  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+  // Strip history arrays and pass only current-ticker products — client components
+  // filter to this ticker internally; passing all 300+ doubles the hydration payload.
+  const leanFiltered = filtered.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   return (
     <>
@@ -173,12 +172,12 @@ export default async function AssetHubPage({ params }: Props) {
       {/* Interactive client */}
       <AssetHubClient
         ticker={t}
-        products={JSON.parse(JSON.stringify(leanProducts))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
         allTickers={allTickers}
       />
 
       {/* SEO editorial content (client-side interactive accordion + about sections) */}
-      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(leanProducts))} />
+      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(leanFiltered))} />
     </>
   );
 }

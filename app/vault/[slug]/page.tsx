@@ -139,6 +139,12 @@ export default async function VaultPage({ params }: Props) {
   const isPrivateCredit = (privateCreditIds || []).some(id => String(id) === String(product.id)) ||
     product.platform_name.toLowerCase() === 'wildcat';
 
+  // Pass only same-ticker products (history stripped) to VaultClient — it only uses them
+  // for rankings and peer comparisons. Passing all 300+ inflates the hydration payload.
+  const sameTickerLean = products
+    .filter(p => (p.ticker || '').toUpperCase() === T)
+    .map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
@@ -273,7 +279,7 @@ export default async function VaultPage({ params }: Props) {
       {/* Interactive client component */}
       <VaultClient
         product={JSON.parse(JSON.stringify(product))}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(sameTickerLean))}
         isPrivateCredit={isPrivateCredit}
       />
     </>
