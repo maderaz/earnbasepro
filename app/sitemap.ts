@@ -9,6 +9,9 @@ function nameToSlug(name: string): string {
 
 function networkToSlug(network: string): string {
   const n = network.toLowerCase().replace(/\s+/g, '-');
+  // Pure "Mainnet" products → /ticker/mainnet (matchNetwork: 'mainnet' === 'mainnet')
+  // "Ethereum Mainnet" and "Ethereum" products → /ticker/ethereum (matchNetwork: startsWith)
+  if (n === 'mainnet') return 'mainnet';
   if (n.includes('mainnet') || n === 'ethereum') return 'ethereum';
   if (n.includes('base')) return 'base';
   if (n.includes('arbitrum')) return 'arbitrum';
@@ -41,8 +44,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Network filter pages: /{ticker}/{network}
-  // For Ethereum Mainnet products, emit both /ethereum and /mainnet slugs —
-  // /mainnet is a legacy alias still indexed by Google.
   const networkKeys = new Set<string>();
   const networkUrls: MetadataRoute.Sitemap = [];
 
@@ -65,19 +66,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const netSlug = networkToSlug(p.network || '');
     if (!netSlug) continue;
     addNetworkUrl(ticker, netSlug);
-    // Also emit the /mainnet alias for Ethereum Mainnet pages (legacy indexed URLs)
-    if (netSlug === 'ethereum') {
-      addNetworkUrl(ticker, 'mainnet');
-    }
   }
 
   // Vault pages: /vault/{slug}
-  // Exclude dead vaults — same condition as noindex in vault page generateMetadata:
-  // TVL < $5,000 AND 30-day APY = 0. Including noindex pages in the sitemap is contradictory.
+  // Exclude dead vaults (noindex condition) and slugs with explicit hub redirects
+  // in next.config.mjs — those return 308 and should never appear in the sitemap.
+  const REDIRECTED_VAULT_SLUGS = new Set([
+    'cbbtc-wintermute-trading-wildcat-mainnet',
+    'usdt-clearstar-boring-morpho-ethereum',
+  ]);
   const vaultUrls: MetadataRoute.Sitemap = products
     .filter(p =>
       VALID_TICKERS.includes((p.ticker || '').toLowerCase()) &&
-      !((p.tvl ?? 0) < 5000 && (p.monthlyAPY ?? 0) === 0)
+      !((p.tvl ?? 0) < 5000 && (p.monthlyAPY ?? 0) === 0) &&
+      !REDIRECTED_VAULT_SLUGS.has(getProductSlug(p))
     )
     .map(p => ({
       url: `${BASE_URL}/vault/${getProductSlug(p)}`,

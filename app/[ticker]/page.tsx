@@ -6,6 +6,10 @@ import { VALID_TICKERS } from '@/lib/constants';
 import { AssetHubClient } from './asset-hub-client';
 import { AssetSEOContent } from '../components/AssetSEOContent';
 
+function nameToSlug(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 export const dynamic = 'force-dynamic';
 
 interface Props { params: Promise<{ ticker: string }> }
@@ -124,7 +128,9 @@ export default async function AssetHubPage({ params }: Props) {
                       </a>
                     </td>
                     <td className="py-3 pr-4 text-muted-foreground">{p.network}</td>
-                    <td className="py-3 pr-4 text-muted-foreground">{p.platform_name}</td>
+                    <td className="py-3 pr-4 text-muted-foreground">
+                      <a href={`/project/${nameToSlug(p.platform_name)}`} className="hover:text-[#08a671]">{p.platform_name}</a>
+                    </td>
                     <td className="py-3 pr-4 text-right font-medium">{p.spotAPY.toFixed(2)}%</td>
                     <td className="py-3 text-right text-muted-foreground">{formatTVLCompact(p.tvl)}</td>
                   </tr>
