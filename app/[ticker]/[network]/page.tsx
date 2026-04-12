@@ -79,11 +79,9 @@ export default async function NetworkPage({ params }: Props) {
 
   const seo = networkFilterSEO(t, netName, filtered.length, sorted, faqItems);
 
-  // Strip history arrays and pass only current-ticker products — client components
-  // filter to this ticker+network internally; passing all 300+ doubles the hydration payload.
-  const leanFiltered = products
-    .filter(p => (p.ticker || '').toUpperCase() === T)
-    .map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+  // Strip history arrays — not used on this page, can be hundreds of KB.
+  // Pass ALL products so NetworkSEOContent can compute cross-network stats correctly.
+  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   return (
     <>
@@ -200,7 +198,7 @@ export default async function NetworkPage({ params }: Props) {
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(leanFiltered))}
+        products={JSON.parse(JSON.stringify(leanProducts))}
       />
 
       {/* SEO editorial content (client-side interactive accordion) */}
@@ -208,7 +206,7 @@ export default async function NetworkPage({ params }: Props) {
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(leanFiltered))}
+        products={JSON.parse(JSON.stringify(leanProducts))}
       />
     </>
   );
