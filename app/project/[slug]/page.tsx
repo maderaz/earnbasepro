@@ -65,6 +65,8 @@ export default async function ProjectPage({ params }: Props) {
   const sorted = [...filtered].sort((a, b) => b.spotAPY - a.spotAPY);
   const networks = [...new Set(filtered.map(p => p.network))];
   const seo = projectPageSEO(projectName, slug, filtered.length, tickers, sorted);
+  // Pass only this project's products (history stripped) — client only uses these
+  const leanFiltered = filtered.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   // FAQ
   const topProduct = sorted[0];
@@ -171,7 +173,7 @@ export default async function ProjectPage({ params }: Props) {
       {/* Interactive client */}
       <ProjectClient
         slug={slug}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
       />
     </>
   );

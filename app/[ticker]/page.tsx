@@ -6,6 +6,10 @@ import { VALID_TICKERS } from '@/lib/constants';
 import { AssetHubClient } from './asset-hub-client';
 import { AssetSEOContent } from '../components/AssetSEOContent';
 
+function nameToSlug(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 export const dynamic = 'force-dynamic';
 
 interface Props { params: Promise<{ ticker: string }> }
@@ -68,10 +72,9 @@ export default async function AssetHubPage({ params }: Props) {
   products.forEach(p => tickerCounts.set(p.ticker.toUpperCase(), (tickerCounts.get(p.ticker.toUpperCase()) || 0) + 1));
   const allTickers = [...tickerCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
 
-  // Strip history arrays from products before passing as page props — these arrays
-  // (dailyApyHistory, tvlHistory) can be hundreds of KB and are not used by any
-  // component on this page. They are only needed on individual vault pages.
-  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+  // Strip history arrays and pass only current-ticker products — client components
+  // filter to this ticker internally; passing all 300+ doubles the hydration payload.
+  const leanFiltered = filtered.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   return (
     <>
@@ -125,7 +128,9 @@ export default async function AssetHubPage({ params }: Props) {
                       </a>
                     </td>
                     <td className="py-3 pr-4 text-muted-foreground">{p.network}</td>
-                    <td className="py-3 pr-4 text-muted-foreground">{p.platform_name}</td>
+                    <td className="py-3 pr-4 text-muted-foreground">
+                      <a href={`/project/${nameToSlug(p.platform_name)}`} className="hover:text-[#08a671]">{p.platform_name}</a>
+                    </td>
                     <td className="py-3 pr-4 text-right font-medium">{p.spotAPY.toFixed(2)}%</td>
                     <td className="py-3 text-right text-muted-foreground">{formatTVLCompact(p.tvl)}</td>
                   </tr>
@@ -173,12 +178,12 @@ export default async function AssetHubPage({ params }: Props) {
       {/* Interactive client */}
       <AssetHubClient
         ticker={t}
-        products={JSON.parse(JSON.stringify(leanProducts))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
         allTickers={allTickers}
       />
 
       {/* SEO editorial content (client-side interactive accordion + about sections) */}
-      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(leanProducts))} />
+      <AssetSEOContent ticker={t} products={JSON.parse(JSON.stringify(leanFiltered))} />
     </>
   );
 }

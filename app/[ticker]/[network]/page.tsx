@@ -5,6 +5,10 @@ import { resolveNetworkKey, computeNetworkSEOVars, buildNetworkFaq, getNetworkYi
 import { NetworkFilterClient } from './network-filter-client';
 import { NetworkSEOContent } from '../../components/NetworkSEOContent';
 
+function nameToSlug(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
 
 interface Props { params: Promise<{ ticker: string; network: string }> }
@@ -75,8 +79,11 @@ export default async function NetworkPage({ params }: Props) {
 
   const seo = networkFilterSEO(t, netName, filtered.length, sorted, faqItems);
 
-  // Strip history arrays — not used on this page, can be hundreds of KB
-  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+  // Strip history arrays and pass only current-ticker products — client components
+  // filter to this ticker+network internally; passing all 300+ doubles the hydration payload.
+  const leanFiltered = products
+    .filter(p => (p.ticker || '').toUpperCase() === T)
+    .map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   return (
     <>
@@ -121,8 +128,14 @@ export default async function NetworkPage({ params }: Props) {
                         {p.product_name}
                       </a>
                     </td>
-                    <td className="py-3 pr-4 text-muted-foreground">{p.platform_name}</td>
-                    <td className="py-3 pr-4 text-muted-foreground">{p.curator && p.curator !== '-' ? p.curator.trim() : '—'}</td>
+                    <td className="py-3 pr-4 text-muted-foreground">
+                      <a href={`/project/${nameToSlug(p.platform_name)}`} className="hover:text-[#08a671]">{p.platform_name}</a>
+                    </td>
+                    <td className="py-3 pr-4 text-muted-foreground">
+                      {p.curator && p.curator !== '-'
+                        ? <a href={`/curator/${nameToSlug(p.curator.trim())}`} className="hover:text-[#08a671]">{p.curator.trim()}</a>
+                        : '—'}
+                    </td>
                     <td className="py-3 pr-4 text-right font-medium">{p.spotAPY.toFixed(2)}%</td>
                     <td className="py-3 text-right text-muted-foreground">{formatTVLCompact(p.tvl)}</td>
                   </tr>
@@ -187,7 +200,7 @@ export default async function NetworkPage({ params }: Props) {
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(leanProducts))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
       />
 
       {/* SEO editorial content (client-side interactive accordion) */}
@@ -195,7 +208,7 @@ export default async function NetworkPage({ params }: Props) {
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(leanProducts))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
       />
     </>
   );

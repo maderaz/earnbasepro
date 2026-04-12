@@ -8,6 +8,10 @@ export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeo
 
 interface Props { params: Promise<{ slug: string }> }
 
+function nameToSlug(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 function findProduct(products: DeFiProduct[], slug: string): DeFiProduct | undefined {
   return products.find(p => getProductSlug(p) === slug);
 }
@@ -139,6 +143,21 @@ export default async function VaultPage({ params }: Props) {
   const isPrivateCredit = (privateCreditIds || []).some(id => String(id) === String(product.id)) ||
     product.platform_name.toLowerCase() === 'wildcat';
 
+  // Determine if project/curator pages exist (to create valid inlinks, not broken links)
+  const platformProductCount = products.filter(p => p.platform_name === product.platform_name).length;
+  const curator = hasCurator ? product.curator!.trim() : null;
+  const curatorProductCount = curator
+    ? products.filter(p => p.curator?.trim() === curator).length
+    : 0;
+  const hasProjectPage = platformProductCount >= 2;
+  const hasCuratorPage = curatorProductCount >= 4;
+
+  // Pass only same-ticker products (history stripped) to VaultClient — it only uses them
+  // for rankings and peer comparisons. Passing all 300+ inflates the hydration payload.
+  const sameTickerLean = products
+    .filter(p => (p.ticker || '').toUpperCase() === T)
+    .map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.structuredData) }} />
@@ -162,7 +181,14 @@ export default async function VaultPage({ params }: Props) {
             <div>
               <h2 className="text-xl font-semibold text-foreground">{product.product_name}</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {product.platform_name}{hasCurator ? ` · Curated by ${product.curator!.trim()}` : ''} · {product.network}
+                {hasProjectPage
+                  ? <a href={`/project/${nameToSlug(product.platform_name)}`} className="hover:text-[#08a671]">{product.platform_name}</a>
+                  : product.platform_name}
+                {hasCurator && ' · Curated by '}
+                {hasCurator && (hasCuratorPage
+                  ? <a href={`/curator/${nameToSlug(curator!)}`} className="hover:text-[#08a671]">{curator}</a>
+                  : curator)}
+                {' · '}{product.network}
               </p>
             </div>
             <span className="text-2xl font-bold text-[#08a671]">{product.spotAPY.toFixed(2)}%</span>
@@ -273,7 +299,7 @@ export default async function VaultPage({ params }: Props) {
       {/* Interactive client component */}
       <VaultClient
         product={JSON.parse(JSON.stringify(product))}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(sameTickerLean))}
         isPrivateCredit={isPrivateCredit}
       />
     </>

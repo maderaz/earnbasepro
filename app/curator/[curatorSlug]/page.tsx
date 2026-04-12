@@ -66,6 +66,8 @@ export default async function CuratorPage({ params }: Props) {
   const networks = [...new Set(filtered.map(p => p.network))];
   const platforms = [...new Set(filtered.map(p => p.platform_name))];
   const seo = curatorPageSEO(curatorName, curatorSlug, filtered.length, tickers, sorted);
+  // Pass only this curator's products (history stripped) — client only uses these
+  const leanFiltered = filtered.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   const topProduct = sorted[0];
   const faqItems = [
@@ -171,7 +173,7 @@ export default async function CuratorPage({ params }: Props) {
       {/* Interactive client */}
       <CuratorClient
         curatorSlug={curatorSlug}
-        products={JSON.parse(JSON.stringify(products))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
       />
     </>
   );
