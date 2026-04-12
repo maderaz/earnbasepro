@@ -44,12 +44,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Network filter pages: /{ticker}/{network}
+  // Exclude network slugs that 308-redirect to the parent hub — destination already in sitemap.
+  const REDIRECTED_NETWORK_SLUGS = new Set([
+    'usdt/ethereum',
+    'eurc/ethereum',
+  ]);
+
   const networkKeys = new Set<string>();
   const networkUrls: MetadataRoute.Sitemap = [];
 
   function addNetworkUrl(ticker: string, netSlug: string) {
     const key = `${ticker}/${netSlug}`;
-    if (!networkKeys.has(key)) {
+    if (!networkKeys.has(key) && !REDIRECTED_NETWORK_SLUGS.has(key)) {
       networkKeys.add(key);
       networkUrls.push({
         url: `${BASE_URL}/${ticker}/${netSlug}`,
