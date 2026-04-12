@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: seo.title,
     description: seo.description,
     alternates: { canonical: pageUrl },
-    openGraph: { title: seo.title, description: seo.description, url: pageUrl },
+    openGraph: { type: 'website', title: seo.title, description: seo.description, url: pageUrl, images: [{ url: '/FEATURED%20IMG.png', width: 1200, height: 630 }] },
     twitter: { title: seo.title, description: seo.description },
   };
 }
@@ -105,9 +105,9 @@ export default async function NetworkPage({ params }: Props) {
         </nav>
 
         <section>
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h1 className="text-2xl font-semibold text-foreground">
             Compare {filtered.length} {T} Yields on {netName}
-          </h2>
+          </h1>
           <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed max-w-2xl">
             {filtered.length} {T} strategies tracked on {netName}. Compare on-chain APY rates, TVL, and yield history side by side.
           </p>

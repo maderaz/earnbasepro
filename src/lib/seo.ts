@@ -263,8 +263,9 @@ export function vaultProductSEO(
     const base = hasCurator
       ? `${productName} on ${platform} (${curator}): ${apy} on-chain ${T} APY on ${network}.`
       : `${productName} on ${platform}: ${apy} on-chain ${T} APY on ${network}.`;
+    const fullWithTvl = `${base} TVL: ${tvlStr}. Compare with ${hc}+ ${T} strategies on Earnbase.`;
     const full = `${base} Compare with ${hc}+ ${T} strategies on Earnbase.`;
-    description = full.length <= 155 ? full : base;
+    description = fullWithTvl.length <= 155 ? fullWithTvl : (full.length <= 155 ? full : base);
   } else {
     const d1 = `${productName} on ${platform}: ${T} yield strategy on ${network}. TVL: ${tvlStr}. Compare with ${hc}+ ${T} strategies on Earnbase.`;
     const d2 = `${productName} on ${platform}: ${T} yield strategy on ${network}. TVL: ${tvlStr}. Yield data tracked daily on Earnbase.`;
