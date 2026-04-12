@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { fetchPools } from '@/lib/api';
 import { networkFilterSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/lib/seo';
 import { resolveNetworkKey, computeNetworkSEOVars, buildNetworkFaq, getNetworkYieldExplainer } from '@/lib/networkSEOData';
-import { NetworkFilterClient } from './network-filter-client';
-import { NetworkSEOContent } from '../../components/NetworkSEOContent';
+import { NetworkHubClient } from './network-hub-client';
 
 function nameToSlug(name: string): string {
   return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -79,9 +78,17 @@ export default async function NetworkPage({ params }: Props) {
 
   const seo = networkFilterSEO(t, netName, filtered.length, sorted, faqItems);
 
-  // Strip history arrays — not used on this page, can be hundreds of KB.
-  // Pass ALL products so NetworkSEOContent can compute cross-network stats correctly.
-  const leanProducts = products.map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
+  const initialNetwork = resolveNetworkKey(netSlug);
+
+  // Compute allTickers sorted by product count (for mobile asset switcher in AssetHubPage)
+  const tickerCounts = new Map<string, number>();
+  products.forEach(p => tickerCounts.set(p.ticker.toUpperCase(), (tickerCounts.get(p.ticker.toUpperCase()) || 0) + 1));
+  const allTickers = [...tickerCounts.entries()].sort((a, b) => b[1] - a[1]).map(([tk]) => tk);
+
+  // Pass only current-ticker products (history stripped) — reduces hydration payload significantly.
+  const leanFiltered = products
+    .filter(p => (p.ticker || '').toUpperCase() === T)
+    .map(({ dailyApyHistory: _a, tvlHistory: _t, ...rest }) => rest);
 
   return (
     <>
@@ -193,20 +200,14 @@ export default async function NetworkPage({ params }: Props) {
         </section>
       </div>
 
-      {/* Interactive client */}
-      <NetworkFilterClient
+      {/* Interactive client — full sortable table pre-filtered to this network */}
+      <NetworkHubClient
         ticker={t}
         network={netSlug}
         networkName={netName}
-        products={JSON.parse(JSON.stringify(leanProducts))}
-      />
-
-      {/* SEO editorial content (client-side interactive accordion) */}
-      <NetworkSEOContent
-        ticker={t}
-        network={netSlug}
-        networkName={netName}
-        products={JSON.parse(JSON.stringify(leanProducts))}
+        products={JSON.parse(JSON.stringify(leanFiltered))}
+        allTickers={allTickers}
+        initialNetwork={initialNetwork}
       />
     </>
   );
