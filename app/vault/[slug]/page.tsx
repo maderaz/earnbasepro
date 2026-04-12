@@ -4,7 +4,7 @@ import { vaultProductSEO, BASE_URL, getProductSlug, formatTVLCompact } from '@/l
 import type { DeFiProduct } from '@/lib/api';
 import { VaultClient } from './vault-client';
 
-export const dynamic = 'force-dynamic'; // always fetch fresh, AbortSignal.timeout(8000) in api.ts prevents hangs
+export const revalidate = 300; // revalidate every 5 minutes; stale-while-revalidate keeps TTFB fast for crawlers
 
 interface Props { params: Promise<{ slug: string }> }
 
