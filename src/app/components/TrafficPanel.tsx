@@ -155,6 +155,19 @@ export const TrafficPanel: React.FC = () => {
     return logEvents.filter(ev => !hiddenFingerprintSet.has(getVisitorFingerprint(ev)));
   }, [logEvents, hiddenFingerprintSet, getVisitorFingerprint]);
 
+  /** IDs of rows that start a new session — used for visual grouping in the log table */
+  const sessionBoundaries = useMemo(() => {
+    const boundaries = new Set<string>();
+    let lastSid = '';
+    for (const ev of filteredLogEvents) {
+      if (ev.sessionId !== lastSid) {
+        boundaries.add(ev.id);
+        lastSid = ev.sessionId;
+      }
+    }
+    return boundaries;
+  }, [filteredLogEvents]);
+
   /** Count how many raw events in current page are hidden */
   const hiddenCountInPage = logEvents.length - filteredLogEvents.length;
 
@@ -753,8 +766,11 @@ export const TrafficPanel: React.FC = () => {
                         {loading ? 'Loading...' : logEvents.length > 0 ? 'All events on this page are from hidden visitors' : 'No page views recorded yet'}
                       </td>
                     </tr>
-                  ) : filteredLogEvents.map((ev) => (
-                    <tr key={ev.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors group">
+                  ) : filteredLogEvents.map((ev) => {
+                    const isSessionStart = sessionBoundaries.has(ev.id);
+                    const isInternal = !isSessionStart && (!ev.referrerDomain || ev.referrerDomain === 'direct');
+                    return (
+                    <tr key={ev.id} className={`border-b border-border/50 hover:bg-muted/30 transition-colors group${isSessionStart ? ' border-t border-t-border/60' : ''}`}>
                       <td className="px-4 py-3">
                         <span className="text-xs font-medium text-foreground truncate block max-w-[240px]">{ev.route}</span>
                         {ev.tickerContext && (
@@ -765,7 +781,18 @@ export const TrafficPanel: React.FC = () => {
                         <RouteTypeBadge type={ev.routeType} />
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs font-medium text-muted-foreground">{ev.referrerDomain}</span>
+                        {isInternal ? (
+                          <span className="text-[10px] text-muted-foreground/40 font-medium">↩ internal</span>
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-medium text-muted-foreground">{ev.referrerDomain || 'direct'}</span>
+                            {isSessionStart && ev.sessionId && (
+                              <span className="text-[9px] font-mono text-muted-foreground/30 bg-muted/50 px-1 py-0.5 rounded">
+                                {ev.sessionId.slice(0, 6)}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
@@ -788,7 +815,8 @@ export const TrafficPanel: React.FC = () => {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

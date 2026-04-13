@@ -19,6 +19,16 @@ function getSessionId(): string {
   return id;
 }
 
+function getEntryReferrer(): string {
+  if (typeof sessionStorage === 'undefined') return document.referrer || '';
+  const DONE_KEY = 'earnbase_entry_done';
+  if (sessionStorage.getItem(DONE_KEY)) {
+    return ''; // subsequent page view in same session — not an external entry
+  }
+  sessionStorage.setItem(DONE_KEY, '1');
+  return document.referrer || '';
+}
+
 function extractContext(pathname: string) {
   const segments = pathname.split('/').filter(Boolean);
   if (segments[0] === 'vault' && segments[1]) return { tickerContext: '', networkContext: '', vaultSlug: segments[1] };
@@ -56,7 +66,7 @@ export function PageViewTracker() {
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
           screenWidth: window.screen?.width || 0,
           screenHeight: window.screen?.height || 0,
-          referrer: document.referrer || '',
+          referrer: getEntryReferrer(),
           pageUrl: window.location.href || '',
         },
       }),
