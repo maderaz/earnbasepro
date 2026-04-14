@@ -3,7 +3,7 @@
  * ProductPageV3 — Vault product page client component.
  * Ported from src/app/components/ProductPageV3.tsx
  */
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { DeFiProduct } from '@/lib/api';
 import { getProductSlug } from '@/app/utils/slugify';
@@ -95,32 +95,14 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
     .sort((a, b) => b.spotAPY - a.spotAPY).slice(0, 4), [products, product, hasCurator]);
 
   /* Sticky sub-header */
-  const headerSentinelRef = useRef<HTMLDivElement>(null);
-  const chartEndSentinelRef = useRef<HTMLDivElement>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
   useEffect(() => {
-    const headerEl = headerSentinelRef.current;
-    const chartEl = chartEndSentinelRef.current;
-    if (!headerEl || !chartEl) return;
-    const isMobile = () => window.innerWidth < 640;
-    const getEl = () => isMobile() ? chartEl : headerEl;
-    const getMargin = () => isMobile() ? '0px 0px 0px 0px' : '200px 0px 0px 0px';
-    let observer = new IntersectionObserver(
-      ([entry]) => setShowStickyBar(!entry.isIntersecting),
-      { threshold: 0, rootMargin: getMargin() },
-    );
-    observer.observe(getEl());
-    const onResize = () => {
-      observer.disconnect();
-      observer = new IntersectionObserver(
-        ([entry]) => setShowStickyBar(!entry.isIntersecting),
-        { threshold: 0, rootMargin: getMargin() },
-      );
-      observer.observe(getEl());
-    };
-    window.addEventListener('resize', onResize);
-    return () => { observer.disconnect(); window.removeEventListener('resize', onResize); };
+    // Show sticky bar after scrolling ~20% of the viewport height
+    const THRESHOLD = window.innerHeight * 0.20;
+    const onScroll = () => setShowStickyBar(window.scrollY >= THRESHOLD);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const slug = getProductSlug(product);
@@ -244,7 +226,6 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
               <MetaRow label="Platform" value={product.platform_name} />
               {hasCurator && <MetaRow label="Curator" value={product.curator} />}
             </div>
-            <div ref={chartEndSentinelRef} className="h-0 w-full" aria-hidden="true" />
           </div>
 
           {/* RIGHT — stats */}
@@ -278,7 +259,6 @@ export const ProductPageV3: React.FC<Props> = ({ product, products, isPrivateCre
         </div>
       </div>
 
-      <div ref={headerSentinelRef} className="h-0 w-full" aria-hidden="true" />
 
       {/* REPORT — 2-col layout */}
       <div className="-mx-5 sm:mx-0 bg-white dark:bg-card rounded-t-lg sm:rounded-b-xl sm:rounded-t-none border-b sm:border-x sm:border-b border-[#eff0f4] dark:border-border/20 grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_320px] overflow-hidden">
