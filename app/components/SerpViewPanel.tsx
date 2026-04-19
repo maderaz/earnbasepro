@@ -30,28 +30,17 @@ function buildVaultSEO(p: DeFiProduct) {
   const tvl = formatTVL(p.tvl);
   const slug = getProductSlug(p);
 
-  // Mirror buildVaultTitle from seo.ts — same separator (' - ') and 60-char limit
+  // Mirror buildVaultTitle from seo.ts — stable formula, no live APY in title
   const fullName = p.product_name;
   const shortName = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
-  let title: string;
-  if (showAPY) {
-    const candidates = [
-      `${fullName} - ${apy}% APY | Earnbase`,
-      `${shortName} - ${apy}% APY | Earnbase`,
-      `${fullName} - ${apy}% APY`,
-      `${shortName} - ${apy}% APY`,
-    ];
-    title = candidates.find(t => t.length <= TITLE_LIMIT) ?? candidates[candidates.length - 1];
-  } else {
-    const candidates = [
-      `${fullName} on ${p.platform_name} (${p.network}) | Earnbase`,
-      `${fullName} on ${p.platform_name} | Earnbase`,
-      `${shortName} on ${p.platform_name} | Earnbase`,
-      `${fullName} | Earnbase`,
-      `${shortName} | Earnbase`,
-    ];
-    title = candidates.find(t => t.length <= TITLE_LIMIT) ?? candidates[candidates.length - 1];
-  }
+  const titleCandidates = [
+    `${fullName} – ${T} Yield | Earnbase`,
+    `${shortName} – ${T} Yield | Earnbase`,
+    `${fullName} – ${T} Yield`,
+    `${fullName} | Earnbase`,
+    `${shortName} | Earnbase`,
+  ];
+  const title = titleCandidates.find(t => t.length <= TITLE_LIMIT) ?? titleCandidates[titleCandidates.length - 1];
 
   const descNoAPY = (() => {
     const d1 = `${p.product_name} on ${p.platform_name}: ${T} yield strategy on ${p.network}. TVL: ${tvl}. Compare with ${T} yields. Yield data updated daily on Earnbase.`;
