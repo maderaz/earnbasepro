@@ -34,9 +34,10 @@ function buildVaultSEO(p: DeFiProduct) {
   const fullName = p.product_name;
   const shortName = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
   const titleCandidates = [
+    `${fullName} – ${p.platform_name} ${T} Yield | Earnbase`,
+    `${shortName} – ${p.platform_name} ${T} Yield | Earnbase`,
     `${fullName} – ${T} Yield | Earnbase`,
     `${shortName} – ${T} Yield | Earnbase`,
-    `${fullName} – ${T} Yield`,
     `${fullName} | Earnbase`,
     `${shortName} | Earnbase`,
   ];

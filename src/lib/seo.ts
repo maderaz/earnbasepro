@@ -52,12 +52,13 @@ const APY_THRESHOLDS: Record<string, number> = {
 const shouldShowAPY = (ticker: string, spotAPY: number): boolean =>
   spotAPY >= (APY_THRESHOLDS[ticker.toUpperCase()] ?? 0.50);
 
-function buildVaultTitle(fullName: string, shortName: string, ticker: string): string {
+function buildVaultTitle(fullName: string, shortName: string, ticker: string, platform: string): string {
   const T = ticker.toUpperCase();
   const candidates = [
+    `${fullName} – ${platform} ${T} Yield | Earnbase`,
+    `${shortName} – ${platform} ${T} Yield | Earnbase`,
     `${fullName} – ${T} Yield | Earnbase`,
     `${shortName} – ${T} Yield | Earnbase`,
-    `${fullName} – ${T} Yield`,
     `${fullName} | Earnbase`,
     `${shortName} | Earnbase`,
   ];
@@ -244,7 +245,7 @@ export function vaultProductSEO(
   const hasCurator = curator && curator !== '-' && curator !== '';
   const fullName = productName;
   const shortName = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
-  const title = buildVaultTitle(fullName, shortName, T);
+  const title = buildVaultTitle(fullName, shortName, T, platform);
   const apy = formatAPY(currentAPY);
   const tvlStr = formatTVLCompact(tvl);
   const hc = hubCount || 0;
