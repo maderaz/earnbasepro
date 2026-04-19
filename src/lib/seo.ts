@@ -43,7 +43,6 @@ export interface SEOProduct {
 }
 
 const formatAPY = (apy: number): string => apy.toFixed(2) + '%';
-const formatAPYRaw = (apy: number): string => apy.toFixed(2);
 
 const APY_THRESHOLDS: Record<string, number> = {
   USDC: 0.50, USDT: 0.50, EURC: 0.50,
@@ -53,22 +52,15 @@ const APY_THRESHOLDS: Record<string, number> = {
 const shouldShowAPY = (ticker: string, spotAPY: number): boolean =>
   spotAPY >= (APY_THRESHOLDS[ticker.toUpperCase()] ?? 0.50);
 
-function buildVaultTitle(fullName: string, shortName: string, apyRaw: string | null, slug: string, platform?: string, network?: string): string {
-  const candidates: string[] = [];
-  if (apyRaw) {
-    candidates.push(`${fullName} - ${apyRaw}% APY | Earnbase`);
-    candidates.push(`${shortName} - ${apyRaw}% APY | Earnbase`);
-    candidates.push(`${fullName} - ${apyRaw}% APY`);
-    candidates.push(`${shortName} - ${apyRaw}% APY`);
-  }
-  // When APY is not shown, enrich with platform/network context to avoid short titles
-  if (!apyRaw && platform && network) {
-    candidates.push(`${fullName} on ${platform} (${network}) | Earnbase`);
-    candidates.push(`${fullName} on ${platform} | Earnbase`);
-    candidates.push(`${shortName} on ${platform} | Earnbase`);
-  }
-  candidates.push(`${fullName} | Earnbase`);
-  candidates.push(`${shortName} | Earnbase`);
+function buildVaultTitle(fullName: string, shortName: string, ticker: string): string {
+  const T = ticker.toUpperCase();
+  const candidates = [
+    `${fullName} – ${T} Yield | Earnbase`,
+    `${shortName} – ${T} Yield | Earnbase`,
+    `${fullName} – ${T} Yield`,
+    `${fullName} | Earnbase`,
+    `${shortName} | Earnbase`,
+  ];
   return candidates.find(t => t.length <= TITLE_LIMIT) || candidates[candidates.length - 1];
 }
 
@@ -252,8 +244,7 @@ export function vaultProductSEO(
   const hasCurator = curator && curator !== '-' && curator !== '';
   const fullName = productName;
   const shortName = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
-  const apyRaw = showAPY ? formatAPYRaw(currentAPY) : null;
-  const title = buildVaultTitle(fullName, shortName, apyRaw, slug, platform, network);
+  const title = buildVaultTitle(fullName, shortName, T);
   const apy = formatAPY(currentAPY);
   const tvlStr = formatTVLCompact(tvl);
   const hc = hubCount || 0;
