@@ -10,7 +10,7 @@ import { formatTVL } from '@/app/utils/formatters';
 import { subDays, format } from 'date-fns';
 
 export interface HistoryStats {
-  min: number; max: number; avg: number; stdDev: number;
+  min: number; max: number; avg: number; last30dAvg: number; stdDev: number;
   trendPct: number; trendDirection: 'upward' | 'downward' | 'stable';
   earlyAvg: number; recentAvg: number;
   volatility: 'Low' | 'Moderate' | 'High';
@@ -223,6 +223,8 @@ export function useVaultData(product: DeFiProduct | undefined, products: DeFiPro
     const min = Math.min(...valid);
     const max = Math.max(...valid);
     const avg = valid.reduce((s, v) => s + v, 0) / valid.length;
+    const last30 = valid.slice(-30);
+    const last30dAvg = last30.reduce((s, v) => s + v, 0) / last30.length;
     const variance = valid.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / valid.length;
     const stdDev = Math.sqrt(variance);
     const third = Math.max(1, Math.floor(valid.length / 3));
@@ -232,7 +234,7 @@ export function useVaultData(product: DeFiProduct | undefined, products: DeFiPro
     const trendDirection: 'upward' | 'downward' | 'stable' = trendPct > 5 ? 'upward' : trendPct < -5 ? 'downward' : 'stable';
     const volatility: 'Low' | 'Moderate' | 'High' = stdDev < 0.5 ? 'Low' : stdDev < 2 ? 'Moderate' : 'High';
 
-    return { min, max, avg, stdDev, trendPct, trendDirection, earlyAvg, recentAvg, volatility, dataPoints: valid.length };
+    return { min, max, avg, last30dAvg, stdDev, trendPct, trendDirection, earlyAvg, recentAvg, volatility, dataPoints: valid.length };
   }, [product]);
 
   const tvlStats = useMemo((): TvlStats | null => {
