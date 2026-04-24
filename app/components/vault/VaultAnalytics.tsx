@@ -32,7 +32,8 @@ const YIELD_TRAJECTORY = {
 const APY_STATS = {
   '30D Low': 'Lowest recorded 24h APY in the tracking period.',
   '30D High': 'Highest recorded 24h APY in the tracking period.',
-  '30D Average': 'Mean of all daily APY values in the tracking period.',
+  '30D Average': 'Mean of daily APY values over the last 30 days.',
+  'Lifetime Avg APY': "Mean of all daily APY values since this product was added to Earnbase's index.",
   'Median APY': 'The middle value when all daily APYs are sorted.',
   'Days Above Average': 'Number of days where APY exceeded the period average.',
   'Best Day': 'Single day with the highest recorded APY and the date it occurred.',
@@ -432,7 +433,8 @@ export const VaultAnalytics: React.FC<AnalyticsProps> = ({
           <div>
             <KVRow label="30D Low" value={historyStats.dataPoints < 3 ? 'Pending' : `${historyStats.min.toFixed(2)}%`} tooltip={APY_STATS['30D Low']} labelSuffix={<PeriodSuffix dataPoints={historyStats.dataPoints} />} />
             <KVRow label="30D High" value={historyStats.dataPoints < 3 ? 'Pending' : `${historyStats.max.toFixed(2)}%`} tooltip={APY_STATS['30D High']} labelSuffix={<PeriodSuffix dataPoints={historyStats.dataPoints} />} />
-            <KVRow label="30D Average" value={historyStats.dataPoints < 3 ? 'Pending' : `${historyStats.avg.toFixed(2)}%`} valueColor="text-[#08a671]" tooltip={APY_STATS['30D Average']} labelSuffix={<PeriodSuffix dataPoints={historyStats.dataPoints} />} />
+            <KVRow label="30D Average" value={historyStats.dataPoints < 3 ? 'Pending' : `${historyStats.last30dAvg.toFixed(2)}%`} valueColor="text-[#08a671]" tooltip={APY_STATS['30D Average']} labelSuffix={<PeriodSuffix dataPoints={historyStats.dataPoints} />} />
+            <KVRow label="Lifetime Avg APY" value={historyStats.dataPoints < 3 ? 'Pending' : `${historyStats.avg.toFixed(2)}%`} valueColor="text-[#08a671]" tooltip={APY_STATS['Lifetime Avg APY']} labelSuffix={<span className="text-[11px] text-[#a0a0b0] ml-1">({historyStats.dataPoints}d)</span>} />
             {expandedApyStats && <KVRow label="Median APY" value={`${expandedApyStats.median.toFixed(2)}%`} tooltip={APY_STATS['Median APY']} />}
             {expandedApyStats && <KVRow label="Days Above Average" value={`${expandedApyStats.daysAboveAvg} / ${expandedApyStats.totalDays}`} tooltip={APY_STATS['Days Above Average']} />}
             {expandedApyStats && <KVRow label="Best Day" tooltip={APY_STATS['Best Day']} value={<span><span className="text-[#08a671] font-medium">{expandedApyStats.bestDayApy.toFixed(2)}%</span><span className="ml-1.5 text-[11px] text-[#a0a0b0]">{expandedApyStats.bestDayDate}</span></span>} />}
